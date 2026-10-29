@@ -93,15 +93,59 @@ async function deleteApp(id) {
 }
 
 async function ensureBundledApp() {
+  const BUNDLED_VERSION = '1.1.0';
+  const BUNDLED_NOTES = 'Update 1.1.0: console log notifikasi lokal, status callback per log, salin/hapus log, dan perbaikan scroll daftar aplikasi.';
+  const BUNDLED_FILE = 'notipay-listener.apk';
   const apps = await listApps();
-  if (apps.length) return apps[0];
-  const filePath = path.join(process.cwd(), 'public', 'assets', 'app', 'notipay-listener.apk');
+  const bundled = apps.find((app) => (
+    app.fileName === BUNDLED_FILE || app.url.endsWith('/assets/app/notipay-listener.apk')
+  ));
+
+  const filePath = path.join(process.cwd(), 'public', 'assets', 'app', BUNDLED_FILE);
   let fileSize = 0;
   try {
     fileSize = fs.statSync(filePath).size;
   } catch {
     fileSize = 0;
   }
+
+  if (bundled && bundled.version !== BUNDLED_VERSION) {
+    let url = bundled.url;
+    let updatedSize = fileSize;
+
+    if (config.blobToken) {
+      try {
+        const { uploadFile } = require('./storage');
+        const buffer = fs.readFileSync(filePath);
+        const uploaded = await uploadFile(
+          buffer,
+          BUNDLED_FILE,
+          'application/vnd.android.package-archive',
+          'apk',
+        );
+        url = uploaded.url;
+        updatedSize = buffer.length;
+      } catch (error) {
+        console.warn('[notipay] Gagal memperbarui APK bawaan ke Vercel Blob:', error.message);
+        return bundled;
+      }
+    } else {
+      url = '/assets/app/notipay-listener.apk';
+    }
+
+    const next = {
+      ...bundled,
+      version: BUNDLED_VERSION,
+      notes: BUNDLED_NOTES,
+      url,
+      fileSize: updatedSize,
+      updatedAt: new Date().toISOString(),
+    };
+    await store.set(`app:${bundled.id}`, JSON.stringify(next));
+    return next;
+  }
+
+  if (apps.length) return apps[0];
 
   let url = '/assets/app/notipay-listener.apk';
   if (config.blobToken) {
@@ -110,7 +154,7 @@ async function ensureBundledApp() {
       const buffer = fs.readFileSync(filePath);
       const uploaded = await uploadFile(
         buffer,
-        'notipay-listener.apk',
+        BUNDLED_FILE,
         'application/vnd.android.package-archive',
         'apk',
       );
@@ -122,10 +166,10 @@ async function ensureBundledApp() {
   }
 
   return createApp({
-    version: '1.0.0',
+    version: BUNDLED_VERSION,
     url,
-    notes: 'Build awal: notification listener, filter aplikasi, WorkManager retry, foreground service, dan callback per API key.',
-    fileName: 'notipay-listener.apk',
+    notes: BUNDLED_NOTES,
+    fileName: BUNDLED_FILE,
     fileSize,
     contentType: 'application/vnd.android.package-archive',
   });

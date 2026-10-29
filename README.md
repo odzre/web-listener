@@ -22,6 +22,7 @@ Website NotiPay adalah payment gateway berbasis notifikasi yang dibangun dengan 
 - Callback via WorkManager dengan retry otomatis.
 - Tetap berjalan saat aplikasi ditutup melalui foreground service.
 - Auto-start setelah reboot bila listener diaktifkan.
+- Console log notifikasi lokal dari aplikasi yang dicentang, lengkap dengan status callback, salin, dan hapus log.
 - Halaman tes koneksi, status callback terakhir, dan permintaan pengecualian optimasi baterai.
 - APK siap pasang tersedia di `public/assets/app/notipay-listener.apk` dan dapat diganti dari admin.
 
