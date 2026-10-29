@@ -1,0 +1,73 @@
+<%- include('../partials/head', { useTabler: false }) %>
+<body class="auth-body">
+  <div class="ambient ambient-one"></div>
+  <div class="ambient ambient-two"></div>
+  <div class="auth-shell">
+    <aside class="auth-aside register-aside">
+      <a class="brand-link" href="/"><%- include('../partials/brand') %></a>
+      <div>
+        <span class="section-kicker">Mulai gratis</span>
+        <h2>Hubungkan notifikasi ke order pertama Anda.</h2>
+        <p>Akun baru langsung mendapatkan API key untuk dipasang di aplikasi Android.</p>
+        <div class="auth-points">
+          <span><i class="ti ti-key"></i> API key otomatis</span>
+          <span><i class="ti ti-qrcode"></i> QRIS opsional</span>
+          <span><i class="ti ti-world"></i> Region MY &amp; ID</span>
+        </div>
+      </div>
+      <div class="auth-steps">
+        <div><span>1</span><p>Daftar akun</p></div>
+        <div><span>2</span><p>Unduh APK &amp; masukkan API key</p></div>
+        <div><span>3</span><p>Buat order lewat API</p></div>
+      </div>
+    </aside>
+
+    <main class="auth-main">
+      <div class="auth-form-wrap">
+        <div class="auth-mobile-brand"><a class="brand-link" href="/"><%- include('../partials/brand') %></a></div>
+        <h1>Buat akun baru</h1>
+        <p class="auth-sub">Sudah punya akun? <a href="/login">Masuk</a></p>
+        <%- include('../partials/flash') %>
+        <form method="post" action="/register" class="auth-form">
+          <input type="hidden" name="_csrf" value="<%= csrf %>">
+          <div class="form-group">
+            <label for="name">Nama</label>
+            <div class="input-icon">
+              <i class="ti ti-user"></i>
+              <input id="name" name="name" type="text" autocomplete="name" placeholder="Nama Anda" required minlength="2" value="<%= form.name || '' %>">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="email">Email</label>
+            <div class="input-icon">
+              <i class="ti ti-mail"></i>
+              <input id="email" name="email" type="email" autocomplete="email" placeholder="nama@email.com" required value="<%= form.email || '' %>">
+            </div>
+          </div>
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label for="password">Password</label>
+              <div class="input-icon has-action">
+                <i class="ti ti-lock"></i>
+                <input id="password" name="password" type="password" autocomplete="new-password" placeholder="Min. 8 karakter" required minlength="8">
+                <button type="button" class="input-action" data-password-toggle="#password" aria-label="Tampilkan password"><i class="ti ti-eye"></i></button>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="confirm_password">Konfirmasi</label>
+              <div class="input-icon has-action">
+                <i class="ti ti-lock-check"></i>
+                <input id="confirm_password" name="confirm_password" type="password" autocomplete="new-password" placeholder="Ulangi password" required minlength="8">
+                <button type="button" class="input-action" data-password-toggle="#confirm_password" aria-label="Tampilkan password"><i class="ti ti-eye"></i></button>
+              </div>
+            </div>
+          </div>
+          <button class="btn btn-primary btn-lg w-full" type="submit">Buat akun <i class="ti ti-arrow-right"></i></button>
+        </form>
+        <p class="auth-foot">Dengan mendaftar, Anda menyetujui pemrosesan data sesuai kebijakan layanan.</p>
+      </div>
+    </main>
+  </div>
+  <script src="/assets/js/app.js" defer></script>
+</body>
+</html>

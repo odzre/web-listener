@@ -1,0 +1,294 @@
+<%- include('../partials/head', { useTabler: false }) %>
+<body class="landing-body">
+  <div class="ambient ambient-one"></div>
+  <div class="ambient ambient-two"></div>
+  <div class="grid-overlay"></div>
+
+  <% if (site.announcement) { %>
+    <div class="announcement"><i class="ti ti-speakerphone"></i><span><%= site.announcement %></span></div>
+  <% } %>
+
+  <%- include('../partials/public-nav') %>
+
+  <main>
+    <section class="hero">
+      <div class="container hero-grid">
+        <div class="hero-copy">
+          <div class="eyebrow"><span class="pulse-dot"></span> Notification payment gateway</div>
+          <h1>Notifikasi masuk.<br><span class="gradient-text">Transaksi otomatis sukses.</span></h1>
+          <p class="hero-lead">
+            <%= site.siteName %> membaca notifikasi pembayaran dari aplikasi Android pilihan Anda,
+            mengirim callback secara real-time, lalu mengubah order menjadi sukses. Dibuat untuk
+            merchant Malaysia dan Indonesia.
+          </p>
+          <div class="hero-actions">
+            <a href="<%= site.registrationOpen ? '/register' : '/login' %>" class="btn btn-primary btn-lg">Mulai sekarang <i class="ti ti-arrow-right"></i></a>
+            <a href="<%= latestApp ? latestApp.url : '/download' %>" class="btn btn-outline btn-lg">
+              <i class="ti ti-brand-android"></i> Unduh aplikasi
+            </a>
+          </div>
+          <div class="hero-points">
+            <span><i class="ti ti-circle-check"></i> Berjalan di background</span>
+            <span><i class="ti ti-circle-check"></i> Multi-region MY / ID</span>
+            <span><i class="ti ti-circle-check"></i> API key per merchant</span>
+          </div>
+        </div>
+
+        <div class="hero-visual" aria-hidden="true">
+          <div class="visual-glow"></div>
+          <div class="phone-card">
+            <div class="phone-top">
+              <span class="phone-time">09:41</span>
+              <span class="phone-chips"><i class="ti ti-wifi"></i><i class="ti ti-battery-3"></i></span>
+            </div>
+            <div class="phone-app-head">
+              <span class="mini-brand">N</span>
+              <div><strong><%= site.siteName %></strong><small>Listener aktif</small></div>
+              <span class="live-pill"><span></span> LIVE</span>
+            </div>
+            <div class="notification-card">
+              <div class="notif-icon"><i class="ti ti-wallet"></i></div>
+              <div class="notif-copy">
+                <div class="notif-title">DANA <span>baru saja</span></div>
+                <p>RM116.00 diterima untuk -</p>
+              </div>
+            </div>
+            <div class="flow-line"><span></span><i class="ti ti-arrow-down"></i></div>
+            <div class="callback-card">
+              <div class="callback-row">
+                <span>Callback</span><span class="code-pill">200 OK</span>
+              </div>
+              <code>POST /api/v1/callback</code>
+              <div class="callback-row muted">
+                <span>Amount match</span><span>RM116.00</span>
+              </div>
+            </div>
+            <div class="paid-card">
+              <span class="paid-icon"><i class="ti ti-check"></i></span>
+              <div><strong>Order sukses</strong><small>NP261029A7K2Q</small></div>
+              <span class="paid-amount">RM116.00</span>
+            </div>
+            <div class="phone-home"></div>
+          </div>
+          <div class="float-chip float-chip-a"><i class="ti ti-bolt"></i> Real-time</div>
+          <div class="float-chip float-chip-b"><i class="ti ti-shield-check"></i> API key aman</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="trust-strip">
+      <div class="container trust-grid">
+        <div><strong>2</strong><span>Region aktif</span><small>Malaysia &amp; Indonesia</small></div>
+        <div><strong>24/7</strong><span>Listener berjalan</span><small>Foreground service</small></div>
+        <div><strong>&lt; 5s</strong><span>Callback</span><small>Notification ke API</small></div>
+        <div><strong>100%</strong><span>Otomatis</span><small>Tanpa cek manual</small></div>
+      </div>
+    </section>
+
+    <section class="section" id="fitur">
+      <div class="container">
+        <div class="section-head">
+          <span class="section-kicker">Fitur inti</span>
+          <h2>Dari notifikasi menjadi uang masuk, tanpa drama.</h2>
+          <p>Semua komponen yang Anda butuhkan untuk payment gateway berbasis notifikasi, dalam satu alur.</p>
+        </div>
+        <div class="feature-grid">
+          <article class="feature-card feature-wide">
+            <span class="feature-icon icon-cyan"><i class="ti ti-bell-ringing"></i></span>
+            <h3>Notification listener selektif</h3>
+            <p>Pilih aplikasi yang ingin dipantau lewat checklist. Aplikasi lain diabaikan, sehingga callback tetap bersih dan relevan.</p>
+            <div class="mini-checklist">
+              <span><i class="ti ti-check"></i> DANA</span>
+              <span><i class="ti ti-check"></i> Touch 'n Go</span>
+              <span><i class="ti ti-check"></i> ShopeePay</span>
+              <span class="off"><i class="ti ti-x"></i> WhatsApp</span>
+            </div>
+          </article>
+          <article class="feature-card">
+            <span class="feature-icon icon-violet"><i class="ti ti-webhook"></i></span>
+            <h3>Callback real-time</h3>
+            <p>Setiap notifikasi dikirim ke URL callback dengan API key merchant. Retry via WorkManager.</p>
+          </article>
+          <article class="feature-card">
+            <span class="feature-icon icon-green"><i class="ti ti-currency-dollar"></i></span>
+            <h3>Format MY &amp; ID</h3>
+            <p>RM116.00 dan Rp116.000 diparse otomatis ke nominal yang tepat, lalu dicocokkan dengan order pending.</p>
+          </article>
+          <article class="feature-card">
+            <span class="feature-icon icon-orange"><i class="ti ti-api"></i></span>
+            <h3>API sederhana</h3>
+            <p>Satu endpoint untuk membuat order dan satu untuk cek status. Cocok untuk bot, toko, atau aplikasi kasir.</p>
+          </article>
+          <article class="feature-card">
+            <span class="feature-icon icon-blue"><i class="ti ti-layout-dashboard"></i></span>
+            <h3>Dashboard lengkap</h3>
+            <p>Statistik harian dan bulanan per region, riwayat callback, pengelolaan user, dan upload APK.</p>
+          </article>
+          <article class="feature-card">
+            <span class="feature-icon icon-pink"><i class="ti ti-shield-lock"></i></span>
+            <h3>Scoped API key</h3>
+            <p>Callback diverifikasi per merchant. Pending order hanya bisa diproses oleh key pemiliknya.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-alt" id="cara-kerja">
+      <div class="container">
+        <div class="section-head align-left">
+          <span class="section-kicker">Cara kerja</span>
+          <h2>Tiga langkah. Setelah itu biarkan berjalan.</h2>
+        </div>
+        <div class="steps">
+          <div class="step-card">
+            <span class="step-number">01</span>
+            <div class="step-icon"><i class="ti ti-download"></i></div>
+            <h3>Pasang aplikasi</h3>
+            <p>Unduh APK, berikan akses Notification Access, lalu pilih aplikasi pembayaran yang dipantau.</p>
+            <code>Android 8.0+</code>
+          </div>
+          <div class="step-card">
+            <span class="step-number">02</span>
+            <div class="step-icon"><i class="ti ti-plug-connected"></i></div>
+            <h3>Hubungkan API key</h3>
+            <p>Salin API key dari dashboard, tempel ke aplikasi bersama URL callback. Klik test koneksi.</p>
+            <code>/api/v1/callback</code>
+          </div>
+          <div class="step-card">
+            <span class="step-number">03</span>
+            <div class="step-icon"><i class="ti ti-bolt"></i></div>
+            <h3>Transaksi otomatis</h3>
+            <p>Buat order lewat API. Saat notifikasi dengan nominal yang sama masuk, order langsung sukses.</p>
+            <code>status: success</code>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="harga">
+      <div class="container">
+        <div class="section-head">
+          <span class="section-kicker">Dua region</span>
+          <h2>Nominal fleksibel, format mengikuti negara.</h2>
+          <p>Kirim amount dalam unit mata uang. Sistem menyimpan nilai presisi dan menampilkan format lokal.</p>
+        </div>
+        <div class="region-grid">
+          <article class="region-card">
+            <div class="region-head"><span class="flag flag-my">MY</span><div><h3>Malaysia</h3><p>Malaysian Ringgit</p></div><code>region: "my"</code></div>
+            <div class="region-example">
+              <span>Request amount</span><strong>1</strong>
+              <span>Disimpan</span><strong>100 sen</strong>
+              <span>Ditampilkan</span><strong class="money">RM1.00</strong>
+            </div>
+            <p class="region-note">Parsing mendukung format <code>RM116.00</code> dan <code>RM1,000.50</code>.</p>
+          </article>
+          <article class="region-card">
+            <div class="region-head"><span class="flag flag-id">ID</span><div><h3>Indonesia</h3><p>Indonesian Rupiah</p></div><code>region: "id"</code></div>
+            <div class="region-example">
+              <span>Request amount</span><strong>1000</strong>
+              <span>Disimpan</span><strong>1.000 rupiah</strong>
+              <span>Ditampilkan</span><strong class="money">Rp1.000</strong>
+            </div>
+            <p class="region-note">Parsing mendukung format <code>Rp116.000</code> dan <code>IDR 1.000.000</code>.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-api" id="api">
+      <div class="container api-grid">
+        <div class="api-copy">
+          <span class="section-kicker">Developer first</span>
+          <h2>API yang bisa Anda integrasikan dalam 10 menit.</h2>
+          <p>Kirim order, terima QRIS opsional, lalu cek status kapan saja. Semua respons JSON dan konsisten.</p>
+          <ul class="check-list">
+            <li><i class="ti ti-check"></i> Autentikasi API key di body atau header</li>
+            <li><i class="ti ti-check"></i> Expired order 1–180 menit</li>
+            <li><i class="ti ti-check"></i> Status: pending, success, expired</li>
+            <li><i class="ti ti-check"></i> QRIS opsional per order</li>
+          </ul>
+          <a href="/docs" class="text-link">Baca dokumentasi lengkap <i class="ti ti-arrow-right"></i></a>
+        </div>
+        <div class="code-window">
+          <div class="code-bar">
+            <span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span>
+            <span class="code-file">create-order.sh</span>
+            <button class="copy-code" data-copy-target="#heroCode"><i class="ti ti-copy"></i></button>
+          </div>
+          <pre id="heroCode"><code><span class="c-blue">curl</span> -X POST <%= baseUrl %>/api/v1/create-order \
+  -H <span class="c-green">"Content-Type: application/json"</span> \
+  -d <span class="c-green">'{
+    "apikey": "np_live_xxxxxxxxx",
+    "region": "my",
+    "amount": 116,
+    "expired": 5
+  }'</span></code></pre>
+          <div class="code-result">
+            <span class="result-label">201 Created</span>
+            <pre><code>{
+  <span class="c-blue">"success"</span>: true,
+  <span class="c-blue">"data"</span>: {
+    <span class="c-blue">"reference"</span>: <span class="c-green">"NP261029A7K2Q"</span>,
+    <span class="c-blue">"amount"</span>: 11600,
+    <span class="c-blue">"formatted_amount"</span>: <span class="c-green">"RM116.00"</span>,
+    <span class="c-blue">"status"</span>: <span class="c-green">"pending"</span>
+  }
+}</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="faq">
+      <div class="container faq-grid">
+        <div class="faq-intro">
+          <span class="section-kicker">FAQ</span>
+          <h2>Pertanyaan yang sering muncul.</h2>
+          <p>Masih butuh bantuan? Hubungi <a href="mailto:<%= site.supportEmail %>"><%= site.supportEmail %></a>.</p>
+        </div>
+        <div class="faq-list">
+          <details open>
+            <summary>Apakah aplikasi tetap berjalan saat ditutup?</summary>
+            <p>Ya. Aplikasi memakai foreground service dan NotificationListenerService yang di-bind sistem, sehingga tetap membaca notifikasi saat layar mati atau aplikasi dihapus dari recent apps.</p>
+          </details>
+          <details>
+            <summary>Bagaimana callback dicocokkan ke order?</summary>
+            <p>Sistem membaca nominal dari teks notifikasi, menentukan region MY atau ID, lalu mencari order pending dengan nominal yang sama milik API key pengirim. Order tertua dipilih lebih dahulu.</p>
+          </details>
+          <details>
+            <summary>Apakah bisa memakai lebih dari satu akun?</summary>
+            <p>Bisa. Setiap akun memiliki API key sendiri. Callback hanya memproses order milik akun pemilik API key tersebut.</p>
+          </details>
+          <details>
+            <summary>Apakah QRIS wajib?</summary>
+            <p>Tidak. Field <code>qris</code> opsional. Jika diisi payload QRIS, sistem menampilkan QR dan halaman pembayaran otomatis.</p>
+          </details>
+          <details>
+            <summary>Di mana data disimpan?</summary>
+            <p>Data website disimpan di Upstash Redis. File branding dan APK dapat disimpan di Vercel Blob, atau berupa URL eksternal untuk build APK yang lebih besar.</p>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <section class="cta-section">
+      <div class="container">
+        <div class="cta-card">
+          <div>
+            <span class="section-kicker">Siap otomatis?</span>
+            <h2>Biarkan notifikasi bekerja untuk Anda.</h2>
+            <p>Daftar gratis, buat API key pertama, dan sambungkan aplikasi Android dalam beberapa menit.</p>
+          </div>
+          <div class="cta-actions">
+            <a href="<%= site.registrationOpen ? '/register' : '/login' %>" class="btn btn-primary btn-lg"><%= site.registrationOpen ? 'Buat akun gratis' : 'Masuk ke akun' %></a>
+            <a href="/docs" class="btn btn-outline btn-lg">Lihat API</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <%- include('../partials/public-footer') %>
+  <script src="/assets/js/app.js" defer></script>
+</body>
+</html>

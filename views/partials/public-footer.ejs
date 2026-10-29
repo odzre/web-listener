@@ -1,0 +1,36 @@
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a class="brand-link" href="/"><%- include('brand') %></a>
+        <p><%= site.siteDescription %></p>
+        <div class="footer-status"><span class="status-dot"></span> API v1 &middot; MY / ID</div>
+      </div>
+      <div class="footer-col">
+        <h4>Produk</h4>
+        <a href="/#fitur">Fitur</a>
+        <a href="/download">Aplikasi Android</a>
+        <a href="/#harga">Region &amp; format</a>
+        <a href="/#faq">FAQ</a>
+      </div>
+      <div class="footer-col">
+        <h4>Developer</h4>
+        <a href="/docs">Dokumentasi API</a>
+        <a href="/docs#create-order">Create order</a>
+        <a href="/docs#check-status">Check status</a>
+        <a href="/docs#callback">Callback</a>
+      </div>
+      <div class="footer-col">
+        <h4>Akun</h4>
+        <a href="/login">Masuk</a>
+        <a href="/register">Daftar</a>
+        <% if (isAuth) { %><a href="<%= isAdmin ? '/admin' : '/dashboard' %>">Dashboard</a><% } %>
+        <a href="mailto:<%= site.supportEmail %>">Bantuan</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>&copy; <%= currentYear %> <%= site.siteName %>. Semua hak dilindungi.</span>
+      <span class="footer-note"><%= site.footerNote %></span>
+    </div>
+  </div>
+</footer>

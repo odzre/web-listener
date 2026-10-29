@@ -1,0 +1,87 @@
+<%- include('../partials/head', { useTabler: true }) %>
+<body class="layout-fluid admin-body user-body">
+  <div class="page">
+    <aside class="navbar navbar-vertical navbar-expand-lg admin-sidebar user-sidebar" data-bs-theme="dark">
+      <div class="container-fluid">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#userMenu" aria-controls="userMenu" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="sidebar-brand">
+          <a class="brand-link" href="/dashboard"><%- include('../partials/brand') %></a>
+        </div>
+        <div class="collapse navbar-collapse" id="userMenu">
+          <ul class="navbar-nav pt-lg-3">
+            <li class="nav-item <%= currentPath === '/dashboard' ? 'active' : '' %>">
+              <a class="nav-link" href="/dashboard"><span class="nav-link-icon"><i class="ti ti-layout-dashboard"></i></span><span class="nav-link-title">Dashboard</span></a>
+            </li>
+            <li class="nav-item <%= currentPath.startsWith('/orders') ? 'active' : '' %>">
+              <a class="nav-link" href="/orders"><span class="nav-link-icon"><i class="ti ti-receipt"></i></span><span class="nav-link-title">Transaksi</span></a>
+            </li>
+            <li class="nav-item <%= currentPath.startsWith('/settings') ? 'active' : '' %>">
+              <a class="nav-link" href="/settings"><span class="nav-link-icon"><i class="ti ti-settings"></i></span><span class="nav-link-title">Pengaturan</span></a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/download"><span class="nav-link-icon"><i class="ti ti-brand-android"></i></span><span class="nav-link-title">Unduh aplikasi</span></a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/docs"><span class="nav-link-icon"><i class="ti ti-code"></i></span><span class="nav-link-title">Dokumentasi API</span></a>
+            </li>
+            <% if (isAdmin) { %>
+              <li class="nav-item">
+                <a class="nav-link" href="/admin"><span class="nav-link-icon"><i class="ti ti-shield-lock"></i></span><span class="nav-link-title">Admin panel</span></a>
+              </li>
+            <% } %>
+          </ul>
+          <div class="sidebar-bottom">
+            <div class="sidebar-user">
+              <span class="avatar avatar-sm avatar-initials"><%= helpers.initials(user.name) %></span>
+              <div><strong><%= user.name %></strong><small><%= user.email %></small></div>
+            </div>
+            <form method="post" action="/logout">
+              <input type="hidden" name="_csrf" value="<%= csrf %>">
+              <button class="sidebar-link danger" type="submit"><i class="ti ti-logout"></i> Keluar</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <div class="page-wrapper">
+      <header class="navbar navbar-expand-md d-print-none admin-topbar">
+        <div class="container-xl">
+          <div class="page-pretitle"><%= pageSubtitle || 'Merchant console' %></div>
+          <div class="d-flex align-items-center ms-auto gap-2">
+            <span class="topbar-status"><span class="status-dot"></span> API aktif</span>
+            <a href="/docs" class="topbar-icon" title="Dokumentasi"><i class="ti ti-help-circle"></i></a>
+            <button class="topbar-icon" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Akun"><span class="avatar avatar-sm avatar-initials"><%= helpers.initials(user.name) %></span></button>
+            <div class="dropdown-menu dropdown-menu-end">
+              <div class="dropdown-header">
+                <strong><%= user.name %></strong>
+                <div class="text-secondary small"><%= user.email %></div>
+              </div>
+              <a class="dropdown-item" href="/settings"><i class="ti ti-settings me-2"></i>Pengaturan</a>
+              <a class="dropdown-item" href="/download"><i class="ti ti-download me-2"></i>Unduh APK</a>
+              <div class="dropdown-divider"></div>
+              <form method="post" action="/logout">
+                <input type="hidden" name="_csrf" value="<%= csrf %>">
+                <button class="dropdown-item text-danger" type="submit"><i class="ti ti-logout me-2"></i>Keluar</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <div class="page-header d-print-none">
+        <div class="container-xl">
+          <div class="row g-2 align-items-center">
+            <div class="col">
+              <h2 class="page-title"><%= pageHeading || pageTitle %></h2>
+              <% if (typeof pageLead !== 'undefined' && pageLead) { %><div class="text-secondary mt-1"><%= pageLead %></div><% } %>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page-body">
+        <div class="container-xl">
+          <%- include('../partials/flash') %>

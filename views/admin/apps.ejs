@@ -1,0 +1,84 @@
+<%- include('../layouts/admin-start', { pageHeading: 'Aplikasi', pageSubtitle: 'Android releases', pageLead: 'Unggah build APK baru dan atur versi yang ditampilkan ke pengguna.' }) %>
+
+<div class="row g-3">
+  <div class="col-lg-5">
+    <div class="card app-card">
+      <div class="card-header"><h3 class="card-title">Upload versi baru</h3></div>
+      <div class="card-body">
+        <form id="appUploadForm" method="post" action="/admin/apps" enctype="multipart/form-data" data-blob="<%= platform.blob ? '1' : '0' %>" data-csrf="<%= csrf %>">
+          <input type="hidden" name="_csrf" value="<%= csrf %>">
+          <div class="mb-3">
+            <label class="form-label">Versi</label>
+            <input class="form-control" type="text" name="version" placeholder="Contoh: 1.2.0" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">File APK</label>
+            <input id="apkFile" class="form-control" type="file" name="apk" accept=".apk,application/vnd.android.package-archive">
+            <div class="form-hint">Maksimal 80 MB di server lokal. Di Vercel, gunakan URL eksternal atau Vercel Blob untuk file besar.</div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Atau URL APK</label>
+            <input class="form-control" type="url" name="appUrl" placeholder="https://.../notipay.apk">
+            <div class="form-hint">Cocok untuk file besar, misalnya GitHub Releases.</div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Catatan rilis</label>
+            <textarea class="form-control" name="notes" rows="3" placeholder="Perbaikan callback, dukungan Android 15, dll."></textarea>
+          </div>
+          <button id="apkUploadBtn" class="btn btn-primary w-100" type="submit"><i class="ti ti-upload"></i> Upload &amp; aktifkan</button>
+          <div id="apkUploadStatus" class="upload-status" aria-live="polite"></div>
+          <% if (platform.blob) { %><div class="form-hint mt-2"><i class="ti ti-cloud-upload"></i> File APK diunggah langsung ke Vercel Blob, mendukung file besar.</div><% } %>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-7">
+    <div class="card app-card">
+      <div class="card-header"><h3 class="card-title">Riwayat build</h3><div class="text-secondary small ms-auto"><%= apps.length %> versi</div></div>
+      <div class="table-responsive">
+        <table class="table table-vcenter app-table">
+          <thead><tr><th>Versi</th><th>Status</th><th>Ukuran</th><th>Tanggal</th><th class="text-end">Aksi</th></tr></thead>
+          <tbody>
+            <% if (!apps.length) { %>
+              <tr><td colspan="5"><div class="empty-row"><i class="ti ti-apps"></i><p>Belum ada aplikasi yang diunggah.</p></div></td></tr>
+            <% } %>
+            <% apps.forEach((app) => { %>
+              <tr>
+                <td>
+                  <div class="fw-semibold"><%= app.version %></div>
+                  <div class="text-secondary small"><%= app.fileName || 'URL eksternal' %></div>
+                </td>
+                <td><% if (app.active) { %><span class="badge bg-success-lt">Aktif</span><% } else { %><span class="badge bg-secondary-lt">Arsip</span><% } %></td>
+                <td class="text-secondary small"><%= app.fileSize ? (app.fileSize / 1024 / 1024).toFixed(1) + ' MB' : '-' %></td>
+                <td class="text-secondary small"><%= helpers.date(app.createdAt) %></td>
+                <td class="text-end">
+                  <div class="d-inline-flex gap-1">
+                    <a href="<%= app.url %>" class="btn btn-sm btn-outline-secondary" target="_blank" rel="noopener" title="Unduh"><i class="ti ti-download"></i></a>
+                    <% if (!app.active) { %>
+                      <form method="post" action="/admin/apps/<%= app.id %>/activate">
+                        <input type="hidden" name="_csrf" value="<%= csrf %>">
+                        <button class="btn btn-sm btn-outline-primary" type="submit" title="Aktifkan"><i class="ti ti-check"></i></button>
+                      </form>
+                    <% } %>
+                    <form method="post" action="/admin/apps/<%= app.id %>/delete" data-confirm="Hapus versi ini?">
+                      <input type="hidden" name="_csrf" value="<%= csrf %>">
+                      <button class="btn btn-sm btn-outline-danger" type="submit" title="Hapus"><i class="ti ti-trash"></i></button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+              <% if (app.notes) { %>
+                <tr class="notes-row"><td colspan="5"><i class="ti ti-notes"></i> <%= app.notes %></td></tr>
+              <% } %>
+            <% }); %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="/assets/js/blob-client.js" defer></script>
+<script src="/assets/js/apps-upload.js" defer></script>
+<%- include('../layouts/admin-end') %>

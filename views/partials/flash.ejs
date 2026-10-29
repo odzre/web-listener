@@ -1,0 +1,9 @@
+<% if (flash && flash.message) { %>
+  <div class="alert alert-<%= flash.type || 'info' %> alert-dismissible fade show app-alert" role="alert">
+    <div class="d-flex align-items-center gap-2">
+      <i class="ti ti-<%= flash.type === 'success' ? 'circle-check' : flash.type === 'danger' ? 'alert-circle' : flash.type === 'warning' ? 'alert-triangle' : 'info-circle' %>"></i>
+      <span><%= flash.message %></span>
+    </div>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Tutup"></button>
+  </div>
+<% } %>

@@ -1,0 +1,70 @@
+<%- include('../partials/head', { useTabler: false }) %>
+<body class="landing-body inner-page">
+  <div class="ambient ambient-one"></div>
+  <div class="grid-overlay"></div>
+  <%- include('../partials/public-nav') %>
+
+  <main class="container page-section">
+    <div class="payment-wrap">
+      <div class="panel payment-card"<% if (order.status === 'pending') { %> data-auto-refresh="20000"<% } %>>
+        <div class="payment-head">
+          <div>
+            <span class="section-kicker">Halaman pembayaran</span>
+            <h1><%= order.formattedAmount %></h1>
+          </div>
+          <span class="badge badge-<%= helpers.statusClass(order.status) %> status-badge-lg"><%= helpers.statusLabel(order.status) %></span>
+        </div>
+
+        <div class="payment-meta">
+          <div><span>Referensi</span><strong class="mono"><%= order.code %></strong></div>
+          <div><span>Region</span><strong><%= order.region %> &middot; <%= order.currency %></strong></div>
+          <div><span>Dibuat</span><strong><%= helpers.datetime(order.createdAt) %></strong></div>
+          <div><span>Kedaluwarsa</span><strong><%= helpers.datetime(order.expiresAt) %></strong></div>
+        </div>
+
+        <% if (order.status === 'pending') { %>
+          <div class="countdown-box">
+            <span>Selesaikan pembayaran dalam</span>
+            <strong data-countdown="<%= order.expiresAt %>"><%= helpers.countdown(order.expiresAt) %></strong>
+          </div>
+
+          <% if (order.qris) { %>
+            <div class="qr-box">
+              <img src="<%= /^(https?:\/\/|data:image\/)/i.test(order.qris) ? order.qris : `/api/v1/orders/${order.code}/qr` %>" alt="QR pembayaran <%= order.code %>">
+              <p>Scan QR dengan aplikasi pembayaran. Nominal harus sesuai.</p>
+            </div>
+          <% } else { %>
+            <div class="pay-instruction">
+              <i class="ti ti-qrcode"></i>
+              <h3>Lakukan pembayaran <%= order.formattedAmount %></h3>
+              <p>QRIS belum dilampirkan untuk order ini. Gunakan detail pembayaran dari merchant, lalu sistem akan mencocokkan notifikasi secara otomatis.</p>
+              <button class="btn btn-outline" data-copy-text="<%= order.code %>"><i class="ti ti-copy"></i> Salin referensi</button>
+            </div>
+          <% } %>
+        <% } else if (order.status === 'success') { %>
+          <div class="payment-result success">
+            <span class="result-icon"><i class="ti ti-circle-check"></i></span>
+            <h2>Pembayaran berhasil</h2>
+            <p>Order telah dikonfirmasi pada <%= helpers.datetime(order.paidAt) %>.</p>
+          </div>
+        <% } else { %>
+          <div class="payment-result expired">
+            <span class="result-icon"><i class="ti ti-clock-x"></i></span>
+            <h2>Order kedaluwarsa</h2>
+            <p>Batas waktu pembayaran telah berakhir. Silakan buat order baru melalui merchant.</p>
+          </div>
+        <% } %>
+
+        <div class="payment-foot">
+          <span><i class="ti ti-shield-check"></i> Diverifikasi otomatis</span>
+          <button class="btn btn-ghost btn-sm" data-copy-text="<%= order.code %>"><i class="ti ti-copy"></i> Salin kode</button>
+        </div>
+      </div>
+      <p class="payment-help">Butuh bantuan? Hubungi <a href="mailto:<%= site.supportEmail %>"><%= site.supportEmail %></a></p>
+    </div>
+  </main>
+
+  <%- include('../partials/public-footer') %>
+  <script src="/assets/js/app.js" defer></script>
+</body>
+</html>

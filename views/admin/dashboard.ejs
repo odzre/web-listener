@@ -1,0 +1,106 @@
+<%- include('../layouts/admin-start', { pageHeading: 'Dashboard', pageSubtitle: 'Admin overview', pageLead: 'Ringkasan platform, transaksi, dan aktivitas callback.' }) %>
+
+<% const chartMax = Math.max(1, ...chart.map((day) => day.total)); %>
+
+<div class="admin-stat-grid">
+  <article class="admin-stat">
+    <span class="admin-stat-icon blue"><i class="ti ti-users"></i></span>
+    <div><span>Total pengguna</span><strong><%= users.length %></strong><small><%= users.filter((item) => item.status === 'active').length %> aktif</small></div>
+  </article>
+  <article class="admin-stat">
+    <span class="admin-stat-icon violet"><i class="ti ti-receipt"></i></span>
+    <div><span>Total transaksi</span><strong><%= stats.totalOrders %></strong><small><%= stats.todayOrders %> hari ini</small></div>
+  </article>
+  <article class="admin-stat">
+    <span class="admin-stat-icon green"><i class="ti ti-circle-check"></i></span>
+    <div><span>Transaksi sukses</span><strong><%= stats.totalSuccess %></strong><small>+<%= stats.todaySuccess %> hari ini</small></div>
+  </article>
+  <article class="admin-stat">
+    <span class="admin-stat-icon cyan"><i class="ti ti-percentage"></i></span>
+    <div><span>Success rate</span><strong><%= stats.successRate %>%</strong><small>Dari seluruh order</small></div>
+  </article>
+  <article class="admin-stat">
+    <span class="admin-stat-icon orange"><i class="ti ti-clock-hour-4"></i></span>
+    <div><span>Pending</span><strong><%= stats.totalPending %></strong><small>Menunggu callback</small></div>
+  </article>
+  <article class="admin-stat">
+    <span class="admin-stat-icon gray"><i class="ti ti-clock-x"></i></span>
+    <div><span>Expired</span><strong><%= stats.totalExpired %></strong><small>Order kedaluwarsa</small></div>
+  </article>
+</div>
+
+<div class="row g-3">
+  <div class="col-lg-7">
+    <div class="card app-card h-100">
+      <div class="card-header d-flex align-items-center">
+        <div><h3 class="card-title">Aktivitas 7 hari</h3><div class="text-secondary small">Total order dan order sukses</div></div>
+        <div class="chart-legend ms-auto"><span class="legend-total"></span> Order <span class="legend-success"></span> Sukses</div>
+      </div>
+      <div class="card-body">
+        <div class="chart-bars">
+          <% chart.forEach((day) => { %>
+            <div class="chart-col">
+              <div class="chart-pair">
+                <div class="chart-bar total" style="height: <%= Math.max(6, Math.round(day.total / chartMax * 100)) %>%" title="<%= day.total %> order"></div>
+                <div class="chart-bar success" style="height: <%= Math.max(4, Math.round(day.success / chartMax * 100)) %>%" title="<%= day.success %> sukses"></div>
+              </div>
+              <small><%= day.label %></small>
+            </div>
+          <% }); %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-5">
+    <div class="card app-card h-100 revenue-card">
+      <div class="card-header"><h3 class="card-title">Revenue sukses</h3></div>
+      <div class="card-body">
+        <div class="revenue-row">
+          <div><span class="flag flag-my">MY</span><div><small>Malaysia</small><strong><%= stats.revenueMyFormatted %></strong></div></div>
+          <span class="revenue-count"><%= stats.successMy %> order</span>
+        </div>
+        <div class="revenue-row">
+          <div><span class="flag flag-id">ID</span><div><small>Indonesia</small><strong><%= stats.revenueIdFormatted %></strong></div></div>
+          <span class="revenue-count"><%= stats.successId %> order</span>
+        </div>
+        <div class="quick-actions">
+          <a href="/admin/apps" class="quick-action"><i class="ti ti-upload"></i><span>Upload APK</span></a>
+          <a href="/admin/callbacks" class="quick-action"><i class="ti ti-webhook"></i><span>Log callback</span></a>
+          <a href="/admin/settings" class="quick-action"><i class="ti ti-palette"></i><span>Website</span></a>
+          <a href="/admin/users" class="quick-action"><i class="ti ti-key"></i><span>API key user</span></a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card app-card mt-3">
+  <div class="card-header d-flex align-items-center">
+    <h3 class="card-title">Transaksi terbaru</h3>
+    <a href="/admin/orders" class="btn btn-sm btn-outline-secondary ms-auto">Semua transaksi <i class="ti ti-arrow-right"></i></a>
+  </div>
+  <div class="table-responsive">
+    <table class="table table-vcenter app-table">
+      <thead><tr><th>Referensi</th><th>Merchant</th><th>Region</th><th>Nominal</th><th>Status</th><th>Waktu</th><th></th></tr></thead>
+      <tbody>
+        <% if (!recentOrders.length) { %>
+          <tr><td colspan="7"><div class="empty-row"><i class="ti ti-receipt-off"></i><p>Belum ada transaksi.</p></div></td></tr>
+        <% } %>
+        <% recentOrders.forEach((order) => { %>
+          <tr>
+            <td><a class="mono link-primary" href="/pay/<%= order.code %>"><%= order.code %></a></td>
+            <td><div class="d-flex align-items-center gap-2"><span class="avatar avatar-xs avatar-initials"><%= helpers.initials(order.userName) %></span><div><div class="small fw-semibold"><%= order.userName %></div><div class="text-secondary" style="font-size:.72rem"><%= order.userEmail %></div></div></div></td>
+            <td><span class="flag-mini flag-<%= order.region.toLowerCase() %>"><%= order.region %></span></td>
+            <td class="fw-semibold"><%= order.formattedAmount %></td>
+            <td><span class="badge bg-<%= helpers.statusClass(order.status) %>-lt"><%= helpers.statusLabel(order.status) %></span></td>
+            <td class="text-secondary small"><%= helpers.datetime(order.createdAt) %></td>
+            <td class="text-end"><a href="/pay/<%= order.code %>" class="table-action" title="Buka"><i class="ti ti-external-link"></i></a></td>
+          </tr>
+        <% }); %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<%- include('../layouts/admin-end') %>

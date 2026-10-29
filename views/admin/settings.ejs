@@ -1,0 +1,138 @@
+<%- include('../layouts/admin-start', { pageHeading: 'Pengaturan', pageSubtitle: 'Website configuration', pageLead: 'Identitas website, branding, registrasi, dan konfigurasi callback.' }) %>
+
+<div class="row g-3">
+  <div class="col-lg-8">
+    <form method="post" action="/admin/settings" enctype="multipart/form-data">
+      <input type="hidden" name="_csrf" value="<%= csrf %>">
+      <div class="card app-card mb-3">
+        <div class="card-header"><h3 class="card-title">Identitas website</h3></div>
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Nama website</label>
+              <input class="form-control" type="text" name="siteName" value="<%= site.siteName %>" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Title website</label>
+              <input class="form-control" type="text" name="siteTitle" value="<%= site.siteTitle %>" required>
+            </div>
+            <div class="col-12">
+              <label class="form-label">Deskripsi</label>
+              <textarea class="form-control" name="siteDescription" rows="2"><%= site.siteDescription %></textarea>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Email support</label>
+              <input class="form-control" type="email" name="supportEmail" value="<%= site.supportEmail %>">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Announcement bar</label>
+              <input class="form-control" type="text" name="announcement" value="<%= site.announcement %>" placeholder="Kosongkan untuk menyembunyikan">
+            </div>
+            <div class="col-12">
+              <label class="form-label">Footer note</label>
+              <textarea class="form-control" name="footerNote" rows="2"><%= site.footerNote %></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card app-card mb-3">
+        <div class="card-header"><h3 class="card-title">Branding</h3></div>
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Logo</label>
+              <div class="upload-preview">
+                <% if (site.logoUrl) { %><img src="<%= site.logoUrl %>" alt="Logo"><% } else { %><span class="brand-mark"><%= (site.siteName || 'N').charAt(0).toUpperCase() %></span><% } %>
+                <div class="flex-grow-1">
+                  <input class="form-control" type="file" name="logo" accept="image/*">
+                  <div class="form-hint">PNG, JPG, WebP, atau SVG. Maks. 500 KB tanpa Blob.</div>
+                </div>
+              </div>
+              <input class="form-control mt-2" type="url" name="logoUrl" placeholder="Atau URL logo" value="<%= /^(https?:\/\/|\/assets\/)/.test(site.logoUrl) ? site.logoUrl : '' %>">
+              <% if (site.logoUrl) { %><label class="form-check mt-2"><input class="form-check-input" type="checkbox" name="logo_remove" value="1"><span class="form-check-label">Hapus logo</span></label><% } %>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Favicon</label>
+              <div class="upload-preview">
+                <% if (site.faviconUrl) { %><img src="<%= site.faviconUrl %>" alt="Favicon" class="favicon-preview"><% } else { %><span class="favicon-placeholder"><i class="ti ti-photo"></i></span><% } %>
+                <div class="flex-grow-1">
+                  <input class="form-control" type="file" name="favicon" accept="image/*">
+                  <div class="form-hint">Disarankan ICO/PNG 64&times;64.</div>
+                </div>
+              </div>
+              <input class="form-control mt-2" type="url" name="faviconUrl" placeholder="Atau URL favicon" value="<%= /^(https?:\/\/|\/assets\/)/.test(site.faviconUrl) ? site.faviconUrl : '' %>">
+              <% if (site.faviconUrl) { %><label class="form-check mt-2"><input class="form-check-input" type="checkbox" name="favicon_remove" value="1"><span class="form-check-label">Hapus favicon</span></label><% } %>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card app-card mb-3">
+        <div class="card-header"><h3 class="card-title">Akses &amp; status</h3></div>
+        <div class="card-body">
+          <label class="form-check form-switch mb-3">
+            <input class="form-check-input" type="checkbox" name="registrationOpen" <%= site.registrationOpen ? 'checked' : '' %>>
+            <span class="form-check-label"><strong>Buka pendaftaran</strong><small class="d-block text-secondary">Izinkan pengguna baru membuat akun.</small></span>
+          </label>
+          <label class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" name="maintenance" <%= site.maintenance ? 'checked' : '' %>>
+            <span class="form-check-label"><strong>Mode maintenance</strong><small class="d-block text-secondary">Tandai website dalam pemeliharaan (informasi untuk admin).</small></span>
+          </label>
+          <input type="hidden" name="apiDocsUrl" value="<%= site.apiDocsUrl %>">
+        </div>
+        <div class="card-footer d-flex justify-content-end">
+          <button class="btn btn-primary" type="submit"><i class="ti ti-device-floppy"></i> Simpan pengaturan</button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div class="col-lg-4">
+    <div class="card app-card mb-3">
+      <div class="card-header"><h3 class="card-title">Callback endpoint</h3></div>
+      <div class="card-body">
+        <label class="form-label">URL callback</label>
+        <div class="input-group mb-3">
+          <input class="form-control mono" type="text" value="<%= callbackUrl %>" readonly>
+          <button class="btn btn-outline-secondary" type="button" data-copy-text="<%= callbackUrl %>"><i class="ti ti-copy"></i></button>
+        </div>
+        <label class="form-label">Global callback secret</label>
+        <div class="input-group mb-2">
+          <input id="callbackSecret" class="form-control mono" type="password" value="<%= site.callbackSecret %>" readonly>
+          <button class="btn btn-outline-secondary" type="button" data-password-toggle="#callbackSecret"><i class="ti ti-eye"></i></button>
+          <button class="btn btn-outline-secondary" type="button" data-copy-value="#callbackSecret"><i class="ti ti-copy"></i></button>
+        </div>
+        <p class="text-secondary small">Secret ini hanya untuk callback admin/global. Aplikasi merchant sebaiknya memakai API key masing-masing.</p>
+        <form method="post" action="/admin/settings/regenerate-secret" data-confirm="Buat secret baru? Secret lama langsung tidak berlaku.">
+          <input type="hidden" name="_csrf" value="<%= csrf %>">
+          <button class="btn btn-outline-danger w-100" type="submit"><i class="ti ti-refresh"></i> Regenerate secret</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="card app-card mb-3">
+      <div class="card-header"><h3 class="card-title">Informasi API</h3></div>
+      <div class="card-body">
+        <div class="info-list">
+          <div><span>Base URL</span><code><%= baseUrl %>/api/v1</code></div>
+          <div><span>Create order</span><code>POST /create-order</code></div>
+          <div><span>Check status</span><code>GET /check-status</code></div>
+          <div><span>Callback</span><code>POST /callback</code></div>
+        </div>
+        <a href="/docs" class="btn btn-outline-secondary w-100 mt-3" target="_blank"><i class="ti ti-external-link"></i> Buka dokumentasi</a>
+      </div>
+    </div>
+
+    <div class="card app-card">
+      <div class="card-header"><h3 class="card-title">Penyimpanan</h3></div>
+      <div class="card-body">
+        <div class="storage-row"><span><i class="ti ti-database"></i> Upstash Redis</span><span class="badge bg-<%= platform.upstash ? 'success' : 'warning' %>-lt"><%= platform.upstash ? 'Terhubung' : 'Memori sementara' %></span></div>
+        <div class="storage-row"><span><i class="ti ti-cloud-upload"></i> Vercel Blob</span><span class="badge bg-<%= platform.blob ? 'success' : 'secondary' %>-lt"><%= platform.blob ? 'Aktif' : 'Tidak aktif' %></span></div>
+        <p class="text-secondary small mb-0 mt-2">Tanpa Blob, gambar branding disimpan sebagai data URL dan APK harus memakai URL eksternal.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('../layouts/admin-end') %>

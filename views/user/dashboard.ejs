@@ -1,0 +1,126 @@
+<%- include('../layouts/user-start', { pageHeading: 'Dashboard', pageSubtitle: 'Overview merchant', pageLead: 'Statistik transaksi Malaysia dan Indonesia.' }) %>
+
+<% const meta = {
+  MY: { label: 'Malaysia', currency: 'MYR', flag: 'MY' },
+  ID: { label: 'Indonesia', currency: 'IDR', flag: 'ID' }
+}; %>
+
+<div class="merchant-hero">
+  <div>
+    <span class="merchant-kicker">Selamat datang, <%= user.name.split(' ')[0] %></span>
+    <h2>Transaksi Anda dalam satu pandangan.</h2>
+    <p>Listener siap menerima callback. Pantau order pending dan pastikan API key sudah terpasang di aplikasi.</p>
+  </div>
+  <div class="merchant-hero-actions">
+    <a href="/settings" class="btn btn-primary"><i class="ti ti-key"></i> API key</a>
+    <a href="/download" class="btn btn-outline-light"><i class="ti ti-brand-android"></i> Unduh app</a>
+  </div>
+</div>
+
+<% for (const region of ['MY', 'ID']) {
+  const info = meta[region];
+  const regionStats = stats[region]; %>
+  <section class="region-stats">
+    <div class="region-stats-head">
+      <div class="region-title"><span class="flag flag-<%= region.toLowerCase() %>"><%= info.flag %></span><div><h2><%= info.label %></h2><span><%= info.currency %> &middot; total <%= regionStats.daily.totalSuccess %> transaksi sukses</span></div></div>
+      <span class="revenue-pill"><i class="ti ti-cash"></i> <%= regionStats.daily.revenueFormatted %></span>
+    </div>
+
+    <div class="period-label"><span>Harian</span><small>Sejak 00:00 waktu lokal</small></div>
+    <div class="stat-grid">
+      <article class="stat-card stat-pending">
+        <div class="stat-icon"><i class="ti ti-clock-hour-4"></i></div>
+        <div><span>Pending</span><strong><%= regionStats.daily.pending %></strong><small>Menunggu pembayaran</small></div>
+      </article>
+      <article class="stat-card stat-success">
+        <div class="stat-icon"><i class="ti ti-circle-check"></i></div>
+        <div><span>Sukses</span><strong><%= regionStats.daily.success %></strong><small>Order terkonfirmasi hari ini</small></div>
+      </article>
+      <article class="stat-card stat-expired">
+        <div class="stat-icon"><i class="ti ti-clock-x"></i></div>
+        <div><span>Expired</span><strong><%= regionStats.daily.expired %></strong><small>Kedaluwarsa hari ini</small></div>
+      </article>
+      <article class="stat-card stat-total">
+        <div class="stat-icon"><i class="ti ti-chart-arrows-vertical"></i></div>
+        <div><span>Total sukses</span><strong><%= regionStats.daily.totalSuccess %></strong><small><%= regionStats.daily.revenueFormatted %> sepanjang waktu</small></div>
+      </article>
+    </div>
+
+    <div class="period-label"><span>Bulan ini</span><small><%= new Intl.DateTimeFormat('id-ID', { month: 'long', year: 'numeric' }).format(new Date()) %></small></div>
+    <div class="stat-grid">
+      <article class="stat-card stat-pending">
+        <div class="stat-icon"><i class="ti ti-clock-hour-4"></i></div>
+        <div><span>Pending</span><strong><%= regionStats.monthly.pending %></strong><small>Menunggu pembayaran</small></div>
+      </article>
+      <article class="stat-card stat-success">
+        <div class="stat-icon"><i class="ti ti-circle-check"></i></div>
+        <div><span>Sukses</span><strong><%= regionStats.monthly.success %></strong><small>Order terkonfirmasi bulan ini</small></div>
+      </article>
+      <article class="stat-card stat-expired">
+        <div class="stat-icon"><i class="ti ti-clock-x"></i></div>
+        <div><span>Expired</span><strong><%= regionStats.monthly.expired %></strong><small>Kedaluwarsa bulan ini</small></div>
+      </article>
+      <article class="stat-card stat-total">
+        <div class="stat-icon"><i class="ti ti-chart-arrows-vertical"></i></div>
+        <div><span>Total sukses</span><strong><%= regionStats.monthly.totalSuccess %></strong><small><%= regionStats.monthly.revenueFormatted %> sepanjang waktu</small></div>
+      </article>
+    </div>
+  </section>
+<% } %>
+
+<div class="row g-3 mt-2">
+  <div class="col-lg-8">
+    <div class="card app-card">
+      <div class="card-header d-flex align-items-center">
+        <h3 class="card-title">Transaksi terbaru</h3>
+        <a href="/orders" class="btn btn-sm btn-outline-secondary ms-auto">Lihat semua <i class="ti ti-arrow-right"></i></a>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-vcenter app-table">
+          <thead><tr><th>Referensi</th><th>Nominal</th><th>Status</th><th>Waktu</th><th></th></tr></thead>
+          <tbody>
+            <% if (!recentOrders.length) { %>
+              <tr><td colspan="5"><div class="empty-row"><i class="ti ti-receipt-off"></i><p>Belum ada transaksi. Buat order pertama lewat API.</p><a href="/docs#create-order" class="text-link">Lihat contoh request <i class="ti ti-arrow-right"></i></a></div></td></tr>
+            <% } %>
+            <% recentOrders.forEach((order) => { %>
+              <tr>
+                <td><a class="mono link-primary" href="/pay/<%= order.code %>"><%= order.code %></a><div class="text-secondary small"><%= order.region %></div></td>
+                <td class="fw-semibold"><%= order.formattedAmount %></td>
+                <td><span class="badge bg-<%= helpers.statusClass(order.status) %>-lt"><%= helpers.statusLabel(order.status) %></span></td>
+                <td class="text-secondary small"><%= helpers.datetime(order.createdAt) %></td>
+                <td class="text-end"><a href="/pay/<%= order.code %>" class="table-action" title="Buka"><i class="ti ti-external-link"></i></a></td>
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-4">
+    <div class="card app-card mb-3">
+      <div class="card-body">
+        <span class="card-kicker">Aplikasi Android</span>
+        <% if (latestApp) { %>
+          <h3 class="mt-2"><%= latestApp.version %></h3>
+          <p class="text-secondary">Build terbaru siap dipasang. Masukkan API key Anda pada aplikasi.</p>
+          <a href="<%= latestApp.url %>" class="btn btn-primary w-100"><i class="ti ti-download"></i> Unduh APK</a>
+        <% } else { %>
+          <h3 class="mt-2">Belum tersedia</h3>
+          <p class="text-secondary">Admin belum mengunggah build APK. Hubungi administrator.</p>
+          <a href="/download" class="btn btn-outline-secondary w-100">Buka halaman unduh</a>
+        <% } %>
+      </div>
+    </div>
+    <div class="card app-card">
+      <div class="card-body">
+        <span class="card-kicker">Endpoint cepat</span>
+        <div class="endpoint-row"><span class="method post">POST</span><code>/create-order</code></div>
+        <div class="endpoint-row"><span class="method get">GET</span><code>/check-status</code></div>
+        <div class="endpoint-row"><span class="method post">POST</span><code>/callback</code></div>
+        <a href="/docs" class="btn btn-outline-secondary w-100 mt-3"><i class="ti ti-code"></i> Dokumentasi API</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('../layouts/user-end') %>

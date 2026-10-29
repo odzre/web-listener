@@ -1,0 +1,8 @@
+<span class="brand-lockup">
+  <% if (site.logoUrl) { %>
+    <img src="<%= site.logoUrl %>" alt="<%= site.siteName %>" class="brand-logo">
+  <% } else { %>
+    <span class="brand-mark"><%= (site.siteName || 'N').charAt(0).toUpperCase() %></span>
+  <% } %>
+  <span class="brand-name"><%= site.siteName %></span>
+</span>

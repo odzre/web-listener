@@ -1,0 +1,200 @@
+<%- include('../partials/head', { useTabler: false }) %>
+<body class="landing-body inner-page docs-page">
+  <div class="ambient ambient-one"></div>
+  <div class="grid-overlay"></div>
+  <%- include('../partials/public-nav') %>
+
+  <main class="container page-section">
+    <div class="page-hero compact">
+      <span class="section-kicker">Dokumentasi API v1</span>
+      <h1>Integrasi <%= site.siteName %>.</h1>
+      <p>Panduan endpoint create order, check status, callback Android, dan format respons.</p>
+    </div>
+
+    <div class="docs-layout">
+      <aside class="docs-nav">
+        <span>Di halaman ini</span>
+        <a href="#autentikasi">Autentikasi</a>
+        <a href="#create-order">Create order</a>
+        <a href="#check-status">Check status</a>
+        <a href="#callback">Callback Android</a>
+        <a href="#status">Status transaksi</a>
+        <a href="#errors">Error</a>
+      </aside>
+
+      <article class="docs-content">
+        <section id="autentikasi" class="panel docs-block">
+          <h2>Autentikasi</h2>
+          <p>Gunakan API key milik akun Anda. API key dapat dilihat dan dirotasi di halaman <a href="/settings">Pengaturan</a>.</p>
+          <p>Kirim melalui body <code>apikey</code>, query <code>?apikey=</code>, header <code>X-API-Key</code>, atau <code>Authorization: Bearer &lt;key&gt;</code>.</p>
+          <div class="code-window small">
+            <div class="code-bar"><span class="code-file">Base URL</span><button class="copy-code" data-copy-text="<%= baseUrl %>/api/v1"><i class="ti ti-copy"></i></button></div>
+            <pre><code><%= baseUrl %>/api/v1</code></pre>
+          </div>
+        </section>
+
+        <section id="create-order" class="panel docs-block">
+          <div class="docs-title-row">
+            <h2>Create order</h2>
+            <span class="method post">POST</span>
+          </div>
+          <p><code>/api/v1/create-order</code></p>
+          <div class="table-wrap">
+            <table class="docs-table">
+              <thead><tr><th>Field</th><th>Wajib</th><th>Keterangan</th></tr></thead>
+              <tbody>
+                <tr><td><code>apikey</code></td><td>Ya</td><td>API key akun merchant.</td></tr>
+                <tr><td><code>region</code></td><td>Ya</td><td><code>my</code> atau <code>id</code>.</td></tr>
+                <tr><td><code>amount</code></td><td>Ya</td><td>MY: unit ringgit (1 = RM1.00). ID: rupiah (1000 = Rp1.000).</td></tr>
+                <tr><td><code>qris</code></td><td>Tidak</td><td>Payload QRIS atau URL gambar QR.</td></tr>
+                <tr><td><code>expired</code></td><td>Tidak</td><td>Menit. Default 5, maksimal 180.</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="code-window small">
+            <div class="code-bar">
+              <span class="code-file">Request</span>
+              <button class="copy-code" data-copy-target="#createOrderReq"><i class="ti ti-copy"></i></button>
+            </div>
+            <pre id="createOrderReq"><code>curl -X POST <%= baseUrl %>/api/v1/create-order \
+  -H "Content-Type: application/json" \
+  -d '{
+    "apikey": "np_live_xxxxxxxxx",
+    "region": "my",
+    "amount": 116,
+    "qris": "00020101021226...",
+    "expired": 5
+  }'</code></pre>
+          </div>
+          <div class="code-window small">
+            <div class="code-bar">
+              <span class="code-file">Response 201</span>
+              <button class="copy-code" data-copy-target="#createOrderRes"><i class="ti ti-copy"></i></button>
+            </div>
+            <pre id="createOrderRes"><code>{
+  "success": true,
+  "message": "Order berhasil dibuat.",
+  "data": {
+    "order_id": "3f48e2f6-...",
+    "reference": "NP261029A7K2Q",
+    "region": "MY",
+    "currency": "MYR",
+    "amount": 11600,
+    "formatted_amount": "RM116.00",
+    "status": "pending",
+    "qris": null,
+    "qr_url": null,
+    "payment_url": "<%= baseUrl %>/pay/NP261029A7K2Q",
+    "check_status_url": "<%= baseUrl %>/api/v1/check-status",
+    "expires_at": "2026-10-29T02:20:00.000Z",
+    "expires_in": 300
+  }
+}</code></pre>
+          </div>
+          <div class="callout"><i class="ti ti-info-circle"></i><p>Nilai <code>amount</code> pada respons disimpan dalam unit terkecil: sen untuk MY, rupiah untuk ID.</p></div>
+        </section>
+
+        <section id="check-status" class="panel docs-block">
+          <div class="docs-title-row">
+            <h2>Check status</h2>
+            <span class="method get">GET</span>
+            <span class="method post">POST</span>
+          </div>
+          <p><code>/api/v1/check-status</code> &middot; kirim <code>apikey</code> dan salah satu dari <code>order_id</code>, <code>reference</code>, atau <code>trxid</code>.</p>
+          <div class="code-window small">
+            <div class="code-bar">
+              <span class="code-file">Request</span>
+              <button class="copy-code" data-copy-target="#statusReq"><i class="ti ti-copy"></i></button>
+            </div>
+            <pre id="statusReq"><code>curl "<%= baseUrl %>/api/v1/check-status?apikey=np_live_xxxxxxxxx&reference=NP261029A7K2Q"</code></pre>
+          </div>
+          <div class="code-window small">
+            <div class="code-bar">
+              <span class="code-file">Response 200</span>
+              <button class="copy-code" data-copy-target="#statusRes"><i class="ti ti-copy"></i></button>
+            </div>
+            <pre id="statusRes"><code>{
+  "success": true,
+  "data": {
+    "reference": "NP261029A7K2Q",
+    "region": "MY",
+    "amount": 11600,
+    "formatted_amount": "RM116.00",
+    "status": "success",
+    "paid_at": "2026-10-29T02:16:42.000Z",
+    "expires_at": "2026-10-29T02:20:00.000Z"
+  }
+}</code></pre>
+          </div>
+          <p>Order yang melewati waktu expired akan otomatis berubah menjadi <code>expired</code> ketika dicek atau saat cron berjalan.</p>
+        </section>
+
+        <section id="callback" class="panel docs-block">
+          <div class="docs-title-row">
+            <h2>Callback Android</h2>
+            <span class="method post">POST</span>
+          </div>
+          <p><code>/api/v1/callback</code> &middot; dipanggil oleh aplikasi listener. Autentikasi memakai API key merchant agar order yang dicocokkan tetap ter-scope.</p>
+          <div class="code-window small">
+            <div class="code-bar">
+              <span class="code-file">Payload</span>
+              <button class="copy-code" data-copy-target="#callbackReq"><i class="ti ti-copy"></i></button>
+            </div>
+            <pre id="callbackReq"><code>{
+  "apikey": "np_live_xxxxxxxxx",
+  "package": "id.dana",
+  "title": "DANA",
+  "text": "RM116.00 diterima untuk -",
+  "device_id": "android-01",
+  "timestamp": "2026-10-29T02:16:40.000Z"
+}</code></pre>
+          </div>
+          <p>Respons <code>matched: true</code> berarti ada order pending dengan region dan nominal yang cocok. Teks notifikasi yang tidak memiliki nominal akan tersimpan sebagai <code>unmatched</code> dan bisa dicocokkan manual oleh admin.</p>
+          <div class="code-window small">
+            <div class="code-bar"><span class="code-file">Response 200</span></div>
+            <pre><code>{
+  "success": true,
+  "matched": true,
+  "status": "matched",
+  "order": {
+    "reference": "NP261029A7K2Q",
+    "status": "success",
+    "formatted_amount": "RM116.00"
+  }
+}</code></pre>
+          </div>
+        </section>
+
+        <section id="status" class="panel docs-block">
+          <h2>Status transaksi</h2>
+          <div class="status-legend">
+            <div><span class="badge bg-warning-lt">pending</span><p>Order dibuat, menunggu callback dengan nominal yang cocok.</p></div>
+            <div><span class="badge bg-success-lt">success</span><p>Callback cocok dan order sudah dibayar.</p></div>
+            <div><span class="badge bg-secondary-lt">expired</span><p>Melewati batas waktu sebelum ada pembayaran.</p></div>
+          </div>
+        </section>
+
+        <section id="errors" class="panel docs-block">
+          <h2>Error</h2>
+          <p>Semua error menggunakan format JSON dengan field <code>success</code> dan <code>message</code>.</p>
+          <div class="table-wrap">
+            <table class="docs-table">
+              <thead><tr><th>HTTP</th><th>Arti</th></tr></thead>
+              <tbody>
+                <tr><td>400</td><td>Parameter tidak valid, region salah, atau amount kosong.</td></tr>
+                <tr><td>401</td><td>API key / secret tidak valid.</td></tr>
+                <tr><td>403</td><td>Akun ditangguhkan.</td></tr>
+                <tr><td>404</td><td>Order tidak ditemukan atau bukan milik API key.</td></tr>
+                <tr><td>429</td><td>Terlalu banyak request. Coba lagi nanti.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </article>
+    </div>
+  </main>
+
+  <%- include('../partials/public-footer') %>
+  <script src="/assets/js/app.js" defer></script>
+</body>
+</html>

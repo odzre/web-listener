@@ -1,0 +1,55 @@
+<%- include('../layouts/admin-start', { pageHeading: 'Pengguna', pageSubtitle: 'Merchant accounts', pageLead: 'Kelola akses, status, dan API key merchant.' }) %>
+
+<div class="card app-card">
+  <div class="card-header">
+    <div><h3 class="card-title">Daftar pengguna</h3><div class="text-secondary small"><%= users.length %> akun terdaftar</div></div>
+  </div>
+  <div class="table-responsive">
+    <table class="table table-vcenter app-table">
+      <thead><tr><th>Pengguna</th><th>Role</th><th>Status</th><th>API key</th><th>Transaksi</th><th>Bergabung</th><th class="text-end">Aksi</th></tr></thead>
+      <tbody>
+        <% if (!users.length) { %>
+          <tr><td colspan="7"><div class="empty-row"><i class="ti ti-users"></i><p>Belum ada pengguna.</p></div></td></tr>
+        <% } %>
+        <% users.forEach((item) => { const count = counts.get(item.id) || { total: 0, success: 0 }; %>
+          <tr>
+            <td>
+              <div class="d-flex align-items-center gap-2">
+                <span class="avatar avatar-sm avatar-initials"><%= helpers.initials(item.name) %></span>
+                <div><div class="fw-semibold"><%= item.name %><% if (item.id === user.id) { %> <span class="badge bg-blue-lt ms-1">Anda</span><% } %></div><div class="text-secondary small"><%= item.email %></div></div>
+              </div>
+            </td>
+            <td><span class="badge bg-<%= item.role === 'admin' ? 'purple' : 'blue' %>-lt"><%= helpers.statusLabel(item.role) %></span></td>
+            <td><span class="badge bg-<%= helpers.statusClass(item.status) %>-lt"><%= helpers.statusLabel(item.status) %></span></td>
+            <td>
+              <div class="key-cell">
+                <input id="key-<%= item.id %>" class="form-control form-control-sm mono key-input" type="password" value="<%= item.apiKey %>" readonly data-key-field>
+                <button class="copy-mini" type="button" data-key-toggle title="Tampilkan"><i class="ti ti-eye"></i></button>
+                <button class="copy-mini" type="button" data-copy-value="#key-<%= item.id %>" title="Salin"><i class="ti ti-copy"></i></button>
+              </div>
+            </td>
+            <td><strong><%= count.total %></strong><span class="text-secondary small"> / <%= count.success %> sukses</span></td>
+            <td class="text-secondary small"><%= helpers.date(item.createdAt) %></td>
+            <td class="text-end">
+              <div class="d-inline-flex gap-1">
+                <form method="post" action="/admin/users/<%= item.id %>/status" <% if (item.id === user.id) { %>onsubmit="return false"<% } else { %>data-confirm="Ubah status pengguna ini?"<% } %>>
+                  <input type="hidden" name="_csrf" value="<%= csrf %>">
+                  <input type="hidden" name="status" value="<%= item.status === 'active' ? 'suspended' : 'active' %>">
+                  <button class="btn btn-sm <%= item.status === 'active' ? 'btn-outline-danger' : 'btn-outline-success' %>" type="submit" <%= item.id === user.id ? 'disabled' : '' %> title="<%= item.status === 'active' ? 'Tangguhkan' : 'Aktifkan' %>">
+                    <i class="ti ti-<%= item.status === 'active' ? 'user-off' : 'user-check' %>"></i>
+                  </button>
+                </form>
+                <form method="post" action="/admin/users/<%= item.id %>/rotate-key" data-confirm="Rotasi API key pengguna ini?">
+                  <input type="hidden" name="_csrf" value="<%= csrf %>">
+                  <button class="btn btn-sm btn-outline-secondary" type="submit" title="Rotasi API key"><i class="ti ti-refresh"></i></button>
+                </form>
+              </div>
+            </td>
+          </tr>
+        <% }); %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<%- include('../layouts/admin-end') %>

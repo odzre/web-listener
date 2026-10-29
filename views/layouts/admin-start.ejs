@@ -1,0 +1,83 @@
+<%- include('../partials/head', { useTabler: true }) %>
+<body class="layout-fluid admin-body">
+  <div class="page">
+    <aside class="navbar navbar-vertical navbar-expand-lg admin-sidebar" data-bs-theme="dark">
+      <div class="container-fluid">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#adminMenu" aria-controls="adminMenu" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="sidebar-brand">
+          <a class="brand-link" href="/admin"><%- include('../partials/brand') %></a>
+          <span class="admin-tag">ADMIN</span>
+        </div>
+        <div class="collapse navbar-collapse" id="adminMenu">
+          <ul class="navbar-nav pt-lg-3">
+            <li class="nav-item <%= currentPath === '/admin' ? 'active' : '' %>">
+              <a class="nav-link" href="/admin"><span class="nav-link-icon"><i class="ti ti-layout-dashboard"></i></span><span class="nav-link-title">Dashboard</span></a>
+            </li>
+            <li class="nav-item <%= currentPath.startsWith('/admin/users') ? 'active' : '' %>">
+              <a class="nav-link" href="/admin/users"><span class="nav-link-icon"><i class="ti ti-users"></i></span><span class="nav-link-title">Pengguna</span></a>
+            </li>
+            <li class="nav-item <%= currentPath.startsWith('/admin/orders') ? 'active' : '' %>">
+              <a class="nav-link" href="/admin/orders"><span class="nav-link-icon"><i class="ti ti-receipt"></i></span><span class="nav-link-title">Transaksi</span></a>
+            </li>
+            <li class="nav-item <%= currentPath.startsWith('/admin/callbacks') ? 'active' : '' %>">
+              <a class="nav-link" href="/admin/callbacks"><span class="nav-link-icon"><i class="ti ti-webhook"></i></span><span class="nav-link-title">Callback</span></a>
+            </li>
+            <li class="nav-item <%= currentPath.startsWith('/admin/apps') ? 'active' : '' %>">
+              <a class="nav-link" href="/admin/apps"><span class="nav-link-icon"><i class="ti ti-apps"></i></span><span class="nav-link-title">Aplikasi</span></a>
+            </li>
+            <li class="nav-item <%= currentPath.startsWith('/admin/settings') ? 'active' : '' %>">
+              <a class="nav-link" href="/admin/settings"><span class="nav-link-icon"><i class="ti ti-settings"></i></span><span class="nav-link-title">Pengaturan</span></a>
+            </li>
+          </ul>
+          <div class="sidebar-bottom">
+            <a href="/" class="sidebar-link"><i class="ti ti-world"></i> Lihat website</a>
+            <a href="/docs" class="sidebar-link"><i class="ti ti-code"></i> Dokumentasi API</a>
+            <form method="post" action="/logout">
+              <input type="hidden" name="_csrf" value="<%= csrf %>">
+              <button class="sidebar-link danger" type="submit"><i class="ti ti-logout"></i> Keluar</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <div class="page-wrapper">
+      <header class="navbar navbar-expand-md d-print-none admin-topbar">
+        <div class="container-xl">
+          <div class="page-pretitle"><%= pageSubtitle || 'Control center' %></div>
+          <div class="d-flex align-items-center ms-auto gap-2">
+            <a href="/docs" class="topbar-icon" title="Dokumentasi"><i class="ti ti-help-circle"></i></a>
+            <button class="topbar-icon" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Akun"><span class="avatar avatar-sm avatar-initials"><%= helpers.initials(user.name) %></span></button>
+            <div class="dropdown-menu dropdown-menu-end">
+              <div class="dropdown-header">
+                <strong><%= user.name %></strong>
+                <div class="text-secondary small"><%= user.email %></div>
+              </div>
+              <a class="dropdown-item" href="/admin/settings"><i class="ti ti-settings me-2"></i>Pengaturan</a>
+              <a class="dropdown-item" href="/dashboard"><i class="ti ti-user me-2"></i>Dashboard user</a>
+              <div class="dropdown-divider"></div>
+              <form method="post" action="/logout">
+                <input type="hidden" name="_csrf" value="<%= csrf %>">
+                <button class="dropdown-item text-danger" type="submit"><i class="ti ti-logout me-2"></i>Keluar</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <div class="page-header d-print-none">
+        <div class="container-xl">
+          <div class="row g-2 align-items-center">
+            <div class="col">
+              <h2 class="page-title"><%= pageHeading || pageTitle %></h2>
+              <% if (typeof pageLead !== 'undefined' && pageLead) { %><div class="text-secondary mt-1"><%= pageLead %></div><% } %>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page-body">
+        <div class="container-xl">
+          <%- include('../partials/flash') %>

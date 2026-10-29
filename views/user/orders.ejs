@@ -1,0 +1,54 @@
+<%- include('../layouts/user-start', { pageHeading: 'Transaksi', pageSubtitle: 'Order history', pageLead: 'Riwayat order dan status pembayaran Anda.' }) %>
+
+<div class="card app-card">
+  <div class="card-header flex-wrap gap-2">
+    <div>
+      <h3 class="card-title">Semua transaksi</h3>
+      <div class="text-secondary small"><%= total %> transaksi ditemukan</div>
+    </div>
+    <form class="filter-row ms-auto" method="get" action="/orders">
+      <input class="form-control form-control-sm" type="search" name="q" value="<%= filters.q %>" placeholder="Cari referensi...">
+      <select class="form-select form-select-sm" name="region">
+        <option value="">Semua region</option>
+        <option value="MY" <%= filters.region === 'MY' ? 'selected' : '' %>>Malaysia</option>
+        <option value="ID" <%= filters.region === 'ID' ? 'selected' : '' %>>Indonesia</option>
+      </select>
+      <select class="form-select form-select-sm" name="status">
+        <option value="">Semua status</option>
+        <option value="pending" <%= filters.status === 'pending' ? 'selected' : '' %>>Pending</option>
+        <option value="success" <%= filters.status === 'success' ? 'selected' : '' %>>Sukses</option>
+        <option value="expired" <%= filters.status === 'expired' ? 'selected' : '' %>>Expired</option>
+      </select>
+      <button class="btn btn-sm btn-primary" type="submit"><i class="ti ti-filter"></i></button>
+    </form>
+  </div>
+  <div class="table-responsive">
+    <table class="table table-vcenter app-table">
+      <thead><tr><th>Referensi</th><th>Region</th><th>Nominal</th><th>Status</th><th>Dibuat</th><th>Kedaluwarsa</th><th></th></tr></thead>
+      <tbody>
+        <% if (!orders.length) { %>
+          <tr><td colspan="7"><div class="empty-row"><i class="ti ti-receipt-off"></i><p>Tidak ada transaksi yang cocok dengan filter.</p></div></td></tr>
+        <% } %>
+        <% orders.forEach((order) => { %>
+          <tr>
+            <td>
+              <a class="mono link-primary" href="/pay/<%= order.code %>"><%= order.code %></a>
+              <button class="copy-mini" type="button" data-copy-text="<%= order.code %>" title="Salin"><i class="ti ti-copy"></i></button>
+            </td>
+            <td><span class="flag-mini flag-<%= order.region.toLowerCase() %>"><%= order.region %></span></td>
+            <td class="fw-semibold"><%= order.formattedAmount %></td>
+            <td><span class="badge bg-<%= helpers.statusClass(order.status) %>-lt"><%= helpers.statusLabel(order.status) %></span></td>
+            <td class="text-secondary small"><%= helpers.datetime(order.createdAt) %></td>
+            <td class="text-secondary small"><%= helpers.datetime(order.expiresAt) %></td>
+            <td class="text-end"><a href="/pay/<%= order.code %>" class="table-action" title="Buka halaman pembayaran"><i class="ti ti-external-link"></i></a></td>
+          </tr>
+        <% }); %>
+      </tbody>
+    </table>
+  </div>
+  <% if (total > 100) { %>
+    <div class="card-footer text-secondary small">Menampilkan 100 transaksi terbaru dari <%= total %> hasil.</div>
+  <% } %>
+</div>
+
+<%- include('../layouts/user-end') %>

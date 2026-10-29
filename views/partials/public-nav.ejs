@@ -1,0 +1,36 @@
+<header class="site-nav" id="siteNav">
+  <div class="container nav-inner">
+    <a class="brand-link" href="/" aria-label="<%= site.siteName %>">
+      <%- include('brand') %>
+    </a>
+    <button class="nav-toggle" type="button" aria-label="Buka menu" aria-expanded="false" data-nav-toggle>
+      <i class="ti ti-menu-2"></i>
+    </button>
+    <nav class="nav-links" data-nav-links>
+      <a href="/#fitur">Fitur</a>
+      <a href="/#cara-kerja">Cara kerja</a>
+      <a href="/#api">API</a>
+      <a href="/docs">Dokumentasi</a>
+      <a href="/download">Unduh app</a>
+      <div class="mobile-nav-auth">
+        <% if (isAuth) { %>
+          <a href="<%= isAdmin ? '/admin' : '/dashboard' %>" class="btn btn-primary"><i class="ti ti-layout-dashboard"></i> <%= isAdmin ? 'Admin panel' : 'Dashboard' %></a>
+        <% } else { %>
+          <a href="/login" class="btn btn-outline">Masuk</a>
+          <% if (site.registrationOpen) { %><a href="/register" class="btn btn-primary">Daftar gratis</a><% } %>
+        <% } %>
+      </div>
+    </nav>
+    <div class="nav-actions">
+      <% if (isAuth) { %>
+        <a href="<%= isAdmin ? '/admin' : '/dashboard' %>" class="btn btn-ghost">
+          <i class="ti ti-layout-dashboard"></i>
+          <span><%= isAdmin ? 'Admin panel' : 'Dashboard' %></span>
+        </a>
+      <% } else { %>
+        <a href="/login" class="btn btn-ghost">Masuk</a>
+        <% if (site.registrationOpen) { %><a href="/register" class="btn btn-primary">Daftar gratis <i class="ti ti-arrow-up-right"></i></a><% } %>
+      <% } %>
+    </div>
+  </div>
+</header>

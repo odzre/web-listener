@@ -1,0 +1,56 @@
+<%- include('../partials/head', { useTabler: false }) %>
+<body class="auth-body">
+  <div class="ambient ambient-one"></div>
+  <div class="ambient ambient-two"></div>
+  <div class="auth-shell">
+    <aside class="auth-aside">
+      <a class="brand-link" href="/"><%- include('../partials/brand') %></a>
+      <div>
+        <span class="section-kicker">Merchant console</span>
+        <h2>Semua transaksi, satu dashboard yang tenang.</h2>
+        <p>Pantau order Malaysia dan Indonesia, kelola callback, dan ambil API key kapan saja.</p>
+        <div class="auth-points">
+          <span><i class="ti ti-chart-histogram"></i> Statistik harian &amp; bulanan</span>
+          <span><i class="ti ti-webhook"></i> Log callback transparan</span>
+          <span><i class="ti ti-device-mobile"></i> Listener background</span>
+        </div>
+      </div>
+      <div class="auth-quote">
+        <p>&ldquo;Notifikasi pembayaran langsung jadi status order. Tidak perlu cek manual lagi.&rdquo;</p>
+        <span>Merchant Malaysia &middot; MY</span>
+      </div>
+    </aside>
+
+    <main class="auth-main">
+      <div class="auth-form-wrap">
+        <div class="auth-mobile-brand"><a class="brand-link" href="/"><%- include('../partials/brand') %></a></div>
+        <h1>Masuk ke akun</h1>
+        <p class="auth-sub">Belum punya akun? <a href="/register">Daftar gratis</a></p>
+        <%- include('../partials/flash') %>
+        <form method="post" action="/login" class="auth-form">
+          <input type="hidden" name="_csrf" value="<%= csrf %>">
+          <input type="hidden" name="next" value="<%= next || '' %>">
+          <div class="form-group">
+            <label for="email">Email</label>
+            <div class="input-icon">
+              <i class="ti ti-mail"></i>
+              <input id="email" name="email" type="email" autocomplete="email" placeholder="nama@email.com" required value="<%= form.email || '' %>">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="password">Password</label>
+            <div class="input-icon has-action">
+              <i class="ti ti-lock"></i>
+              <input id="password" name="password" type="password" autocomplete="current-password" placeholder="Masukkan password" required>
+              <button type="button" class="input-action" data-password-toggle="#password" aria-label="Tampilkan password"><i class="ti ti-eye"></i></button>
+            </div>
+          </div>
+          <button class="btn btn-primary btn-lg w-full" type="submit">Masuk <i class="ti ti-arrow-right"></i></button>
+        </form>
+        <p class="auth-foot">Dengan masuk, Anda menyetujui pemrosesan data sesuai kebijakan layanan.</p>
+      </div>
+    </main>
+  </div>
+  <script src="/assets/js/app.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,58 @@
+<%- include('../partials/head', { useTabler: false }) %>
+<body class="landing-body inner-page">
+  <div class="ambient ambient-one"></div>
+  <div class="grid-overlay"></div>
+  <%- include('../partials/public-nav') %>
+
+  <main class="container page-section">
+    <div class="page-hero compact">
+      <span class="section-kicker">Aplikasi Android</span>
+      <h1>Notification listener yang siap jalan di background.</h1>
+      <p>Pasang sekali, pilih aplikasi pembayaran, lalu biarkan <%= site.siteName %> mengirim callback otomatis.</p>
+    </div>
+
+    <div class="download-grid">
+      <div class="panel download-panel">
+        <div class="app-icon-xl"><i class="ti ti-brand-android"></i></div>
+        <div>
+          <span class="badge-soft">Versi terbaru</span>
+          <h2><%= latestApp ? latestApp.version : 'Belum tersedia' %></h2>
+          <% if (latestApp) { %>
+            <p class="muted">Diunggah <%= helpers.datetime(latestApp.createdAt) %><% if (latestApp.fileSize) { %> &middot; <%= (latestApp.fileSize / 1024 / 1024).toFixed(1) %> MB<% } %></p>
+          <% } else { %>
+            <p class="muted">Administrator belum mengunggah build APK. Anda tetap dapat menghubungkan aplikasi melalui URL callback.</p>
+          <% } %>
+        </div>
+        <% if (latestApp) { %>
+          <a href="<%= latestApp.url %>" class="btn btn-primary btn-lg" download><i class="ti ti-download"></i> Unduh APK</a>
+        <% } else { %>
+          <a href="/login" class="btn btn-outline btn-lg">Masuk ke dashboard</a>
+        <% } %>
+        <% if (latestApp && latestApp.notes) { %>
+          <div class="release-notes">
+            <h3>Catatan rilis</h3>
+            <p><%= latestApp.notes %></p>
+          </div>
+        <% } %>
+      </div>
+
+      <div class="panel setup-panel">
+        <h2>Setup dalam 4 langkah</h2>
+        <ol class="setup-list">
+          <li><span>1</span><div><strong>Izinkan instalasi APK</strong><p>Buka file APK yang diunduh dan izinkan instalasi dari sumber ini.</p></div></li>
+          <li><span>2</span><div><strong>Beri akses notifikasi</strong><p>Masuk ke Settings &rarr; Notification access, lalu aktifkan <%= site.siteName %> Listener.</p></div></li>
+          <li><span>3</span><div><strong>Pilih aplikasi &amp; API key</strong><p>Centang aplikasi pembayaran, tempel API key dari dashboard dan URL callback.</p></div></li>
+          <li><span>4</span><div><strong>Jalankan listener</strong><p>Aktifkan foreground service agar proses tetap hidup saat aplikasi ditutup.</p></div></li>
+        </ol>
+        <div class="callout">
+          <i class="ti ti-info-circle"></i>
+          <p>Beberapa vendor Android membatasi background service. Nonaktifkan optimasi baterai untuk aplikasi ini jika notifikasi tidak terkirim.</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <%- include('../partials/public-footer') %>
+  <script src="/assets/js/app.js" defer></script>
+</body>
+</html>

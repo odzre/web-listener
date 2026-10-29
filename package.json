@@ -1,0 +1,33 @@
+{
+  "name": "notipay",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Notification payment gateway with Android notification listener, Express dashboard and Upstash Redis",
+  "main": "src/server.js",
+  "scripts": {
+    "dev": "node --watch src/server.js",
+    "start": "node src/server.js",
+    "seed": "node scripts/seed.js",
+    "test": "node --test tests/*.test.js",
+    "lint": "node scripts/check-syntax.js",
+    "build:blob": "esbuild src/client/blob-client-entry.js --bundle --minify --format=iife --platform=browser --outfile=public/assets/js/blob-client.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@upstash/redis": "^1.40.0",
+    "@vercel/blob": "^2.8.2",
+    "cookie-parser": "^1.4.7",
+    "dotenv": "^17.2.3",
+    "ejs": "^3.1.10",
+    "express": "^4.22.3",
+    "express-rate-limit": "^8.2.1",
+    "helmet": "^8.1.0",
+    "multer": "^2.5.0",
+    "qrcode": "^1.5.4"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.0"
+  }
+}

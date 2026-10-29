@@ -1,0 +1,70 @@
+<%- include('../layouts/admin-start', { pageHeading: 'Callback', pageSubtitle: 'Notification logs', pageLead: 'Pantau notifikasi masuk, hasil parsing, dan pencocokan order.' }) %>
+
+<div class="card app-card mb-3">
+  <div class="card-body d-flex flex-wrap align-items-center gap-2">
+    <div class="filter-tabs">
+      <a href="/admin/callbacks" class="<%= !filters.status ? 'active' : '' %>">Semua</a>
+      <a href="/admin/callbacks?status=matched" class="<%= filters.status === 'matched' ? 'active' : '' %>">Matched</a>
+      <a href="/admin/callbacks?status=unmatched" class="<%= filters.status === 'unmatched' ? 'active' : '' %>">Unmatched</a>
+      <a href="/admin/callbacks?status=duplicate" class="<%= filters.status === 'duplicate' ? 'active' : '' %>">Duplikat</a>
+    </div>
+    <div class="ms-auto text-secondary small"><%= total %> callback</div>
+  </div>
+</div>
+
+<% if (!callbacks.length) { %>
+  <div class="card app-card"><div class="empty-row py-5"><i class="ti ti-webhook"></i><p>Belum ada callback yang masuk.</p></div></div>
+<% } %>
+
+<div class="callback-list">
+  <% callbacks.forEach((item) => { %>
+    <article class="card app-card callback-item">
+      <div class="callback-item-head">
+        <div class="d-flex align-items-center gap-2 flex-wrap">
+          <span class="badge bg-<%= helpers.statusClass(item.status) %>-lt"><%= helpers.statusLabel(item.status) %></span>
+          <strong class="mono"><%= item.orderCode || item.orderId || 'Belum cocok' %></strong>
+          <% if (item.secretMode) { %><span class="badge bg-purple-lt">Global secret</span><% } %>
+        </div>
+        <span class="text-secondary small"><%= helpers.datetime(item.createdAt) %></span>
+      </div>
+      <div class="callback-item-body">
+        <div class="callback-message">
+          <div class="callback-source">
+            <span class="notif-icon-sm"><i class="ti ti-brand-android"></i></span>
+            <div><strong><%= item.title || item.packageName || 'Notifikasi' %></strong><small><%= item.packageName || 'unknown package' %><% if (item.userEmail) { %> &middot; <%= item.userEmail %><% } %></small></div>
+          </div>
+          <p class="callback-text"><%= item.text || '(tanpa teks)' %></p>
+          <% if (item.reason) { %><p class="callback-reason"><i class="ti ti-info-circle"></i> <%= item.reason %></p><% } %>
+        </div>
+        <div class="callback-side">
+          <div class="callback-data"><span>Nominal terdeteksi</span><strong><%= item.parsed ? helpers.money(item.parsed.region, item.parsed.amount) : '-' %></strong></div>
+          <div class="callback-data"><span>Region</span><strong><%= item.parsed ? item.parsed.region : '-' %></strong></div>
+          <div class="callback-data"><span>Device</span><strong><%= item.deviceId || '-' %></strong></div>
+        </div>
+      </div>
+      <div class="callback-item-foot">
+        <div class="small text-secondary">
+          <% if (item.orderCode) { %><a href="/pay/<%= item.orderCode %>" class="text-link">Buka order <i class="ti ti-external-link"></i></a><% } else { %>Tidak ada order terhubung<% } %>
+        </div>
+        <% if (item.status === 'unmatched' && item.parsed) { %>
+          <form class="callback-match" method="post" action="/admin/callbacks/<%= item.id %>/match">
+            <input type="hidden" name="_csrf" value="<%= csrf %>">
+            <input class="form-control form-control-sm mono" type="text" name="order" placeholder="ID / kode order" required>
+            <button class="btn btn-sm btn-primary" type="submit">Cocokkan manual</button>
+          </form>
+        <% } %>
+      </div>
+      <details class="callback-details">
+        <summary>Detail teknis</summary>
+        <div class="detail-grid">
+          <div><span>Callback ID</span><code><%= item.id %></code></div>
+          <div><span>Order ID</span><code><%= item.orderId || '-' %></code></div>
+          <div><span>IP</span><code><%= item.ip || '-' %></code></div>
+          <div><span>Raw title</span><code><%= item.title || '-' %></code></div>
+        </div>
+      </details>
+    </article>
+  <% }); %>
+</div>
+
+<%- include('../layouts/admin-end') %>

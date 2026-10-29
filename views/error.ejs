@@ -1,0 +1,19 @@
+<%- include('partials/head', { useTabler: false }) %>
+<body class="landing-body inner-page">
+  <div class="ambient ambient-one"></div>
+  <div class="grid-overlay"></div>
+  <%- include('partials/public-nav') %>
+  <main class="container page-section">
+    <div class="error-card panel">
+      <span class="error-code"><%= statusCode || 500 %></span>
+      <h1><%= pageTitle || 'Terjadi kesalahan' %></h1>
+      <p><%= message || 'Permintaan Anda tidak dapat diproses.' %></p>
+      <div class="error-actions">
+        <a href="/" class="btn btn-primary"><i class="ti ti-home"></i> Kembali ke beranda</a>
+        <% if (isAuth) { %><a href="<%= isAdmin ? '/admin' : '/dashboard' %>" class="btn btn-outline">Dashboard</a><% } else { %><a href="/login" class="btn btn-outline">Masuk</a><% } %>
+      </div>
+    </div>
+  </main>
+  <script src="/assets/js/app.js" defer></script>
+</body>
+</html>
