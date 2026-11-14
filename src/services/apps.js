@@ -93,8 +93,8 @@ async function deleteApp(id) {
 }
 
 async function ensureBundledApp() {
-  const BUNDLED_VERSION = '1.1.0';
-  const BUNDLED_NOTES = 'Update 1.1.0: console log notifikasi lokal, status callback per log, salin/hapus log, dan perbaikan scroll daftar aplikasi.';
+  const BUNDLED_VERSION = '1.2.0';
+  const BUNDLED_NOTES = 'Update 1.2.0: dukungan Philippines (PHP/Maya), filter notifikasi uang masuk, dan auto-centang aplikasi Maya.';
   const BUNDLED_FILE = 'notipay-listener.apk';
   const apps = await listApps();
   const bundled = apps.find((app) => (

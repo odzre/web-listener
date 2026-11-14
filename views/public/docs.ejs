@@ -44,8 +44,8 @@
               <thead><tr><th>Field</th><th>Wajib</th><th>Keterangan</th></tr></thead>
               <tbody>
                 <tr><td><code>apikey</code></td><td>Ya</td><td>API key akun merchant.</td></tr>
-                <tr><td><code>region</code></td><td>Ya</td><td><code>my</code> atau <code>id</code>.</td></tr>
-                <tr><td><code>amount</code></td><td>Ya</td><td>MY: unit ringgit (1 = RM1.00). ID: rupiah (1000 = Rp1.000).</td></tr>
+                <tr><td><code>region</code></td><td>Ya</td><td><code>my</code>, <code>id</code>, atau <code>ph</code>.</td></tr>
+                <tr><td><code>amount</code></td><td>Ya</td><td>MY: ringgit (1 = RM1.00). ID: rupiah (1000 = Rp1.000). PH: peso (4250 = ₱4,250.00).</td></tr>
                 <tr><td><code>qris</code></td><td>Tidak</td><td>Payload QRIS atau URL gambar QR.</td></tr>
                 <tr><td><code>expired</code></td><td>Tidak</td><td>Menit. Default 5, maksimal 180.</td></tr>
               </tbody>
@@ -91,7 +91,7 @@
   }
 }</code></pre>
           </div>
-          <div class="callout"><i class="ti ti-info-circle"></i><p>Nilai <code>amount</code> pada respons disimpan dalam unit terkecil: sen untuk MY, rupiah untuk ID.</p></div>
+          <div class="callout"><i class="ti ti-info-circle"></i><p>Nilai <code>amount</code> pada respons disimpan dalam unit terkecil: sen untuk MY, rupiah untuk ID, dan sentimo untuk PH.</p></div>
         </section>
 
         <section id="check-status" class="panel docs-block">
@@ -127,6 +127,7 @@
 }</code></pre>
           </div>
           <p>Order yang melewati waktu expired akan otomatis berubah menjadi <code>expired</code> ketika dicek atau saat cron berjalan.</p>
+          <div class="callout"><i class="ti ti-info-circle"></i><p>Contoh nominal Philippines: request <code>4250</code> menjadi <code>₱4,250.00</code>. Notifikasi masuk dari Maya dengan format <code>You received ₱4,250.00 from</code> akan otomatis dicocokkan.</p></div>
         </section>
 
         <section id="callback" class="panel docs-block">

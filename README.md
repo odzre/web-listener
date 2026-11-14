@@ -1,13 +1,13 @@
 # NotiPay — Notification Payment Gateway
 
-Website NotiPay adalah payment gateway berbasis notifikasi yang dibangun dengan Express.js. Website menerima callback dari aplikasi Android listener, mencocokkan nominal dengan order pending, lalu mengubah statusnya menjadi **success**.
+NotiPay adalah paket aplikasi pembaca notifikasi Android + website payment gateway berbasis Express.js. Aplikasi Android membaca notifikasi dari aplikasi pembayaran yang dipilih, mengirim callback ke website, lalu website mencocokkan nominal dengan order pending dan mengubah statusnya menjadi **success**.
 
 - **Website**: Express.js + EJS + Tabler
 - **Hosting**: Vercel
 - **Database**: Upstash Redis (REST)
 - **File storage**: Vercel Blob (opsional, disarankan)
-- **Aplikasi Android**: tersedia di repository terpisah [odzre/apk-listener](https://github.com/odzre/apk-listener)
-- **Region**: Malaysia (`MY` / MYR) dan Indonesia (`ID` / IDR)
+- **Android**: Kotlin, NotificationListenerService, WorkManager, foreground service
+- **Region**: Malaysia (`MY` / MYR), Indonesia (`ID` / IDR), Philippines (`PH` / PHP)
 
 > Proyek ini adalah alat konfirmasi pembayaran berbasis notifikasi, bukan penyedia payment gateway berlisensi. Pastikan penggunaan sesuai hukum, kebijakan aplikasi pembayaran, dan kebutuhan bisnis Anda. Selalu verifikasi transaksi bernilai besar.
 
@@ -23,13 +23,15 @@ Website NotiPay adalah payment gateway berbasis notifikasi yang dibangun dengan 
 - Tetap berjalan saat aplikasi ditutup melalui foreground service.
 - Auto-start setelah reboot bila listener diaktifkan.
 - Console log notifikasi lokal dari aplikasi yang dicentang, lengkap dengan status callback, salin, dan hapus log.
+- Dukungan Philippines (PHP) termasuk aplikasi Maya, dengan filter uang masuk otomatis.
+- Dukungan Philippines (PHP) termasuk aplikasi Maya, dengan filter uang masuk otomatis.
 - Halaman tes koneksi, status callback terakhir, dan permintaan pengecualian optimasi baterai.
-- APK siap pasang tersedia di `public/assets/app/notipay-listener.apk` dan dapat diganti dari admin.
+- APK debug siap pasang tersedia di `dist/notipay-listener-debug.apk`.
 
 ### Website pengguna
 - Landing page dark, responsif, navbar interaktif, dan footer lengkap.
 - Login, registrasi, dashboard merchant.
-- Statistik harian & bulanan per region: pending, success, expired, total success, revenue.
+- Statistik harian & bulanan per region (MY, ID, PH): pending, success, expired, total success, revenue.
 - Riwayat transaksi dan halaman pembayaran publik.
 - Pengaturan profil, password, API key, dan URL callback.
 - Dokumentasi API.
@@ -66,6 +68,8 @@ Website NotiPay adalah payment gateway berbasis notifikasi yang dibangun dengan 
 ├── public/assets/               # CSS, JS, APK bawaan
 ├── tests/                       # test node:test
 ├── scripts/seed.js
+├── android/                     # project Android Studio
+├── dist/notipay-listener-debug.apk
 └── vercel.json
 ```
 
@@ -188,6 +192,26 @@ Callback yang tidak punya nominal atau tidak menemukan order akan muncul di **Ad
 | `my` | `1` | `100` sen | `RM1.00` |
 | `id` | `1000` | `1000` rupiah | `Rp1.000` |
 | `id` | `1000000` | `1000000` rupiah | `Rp1.000.000` |
+| `ph` | `4250` | `425000` sentimo | `₱4,250.00` |
+| `ph` | `250.50` | `25050` sentimo | `₱250.50` |
+
+Parsing notifikasi mendukung format berikut:
+
+- Malaysia: `RM116.00`, `RM1,000.50`
+- Indonesia: `Rp116.000`, `IDR 1.000.000`
+- Philippines: `₱4,250.00`, `PHP 1,000.50`, `You received ₱4,250.00 from +639550747407`
+
+Notifikasi yang bukan uang masuk (misalnya `You sent ₱4,250.00 to ...`) otomatis diabaikan dan tidak mengubah order.
+| `ph` | `4250` | `425000` sentimo | `₱4,250.00` |
+| `ph` | `250.50` | `25050` sentimo | `₱250.50` |
+
+Parsing notifikasi mendukung format berikut:
+
+- Malaysia: `RM116.00`, `RM1,000.50`
+- Indonesia: `Rp116.000`, `IDR 1.000.000`
+- Philippines: `₱4,250.00`, `PHP 1,000.50`, `You received ₱4,250.00 from +639550747407`
+
+Notifikasi yang bukan uang masuk (misalnya `You sent ₱4,250.00 to ...`) otomatis diabaikan dan tidak mengubah order.
 
 ---
 
@@ -248,19 +272,37 @@ Status: `pending`, `success`, `expired`.
 
 ---
 
-## Aplikasi Android
+## Android App
 
-Source code aplikasi listener ada di repository terpisah:
+Project: `android/`
 
-**https://github.com/odzre/apk-listener**
+Prasyarat build:
+- JDK 17
+- Android SDK 35
+- Android Studio (disarankan) atau Gradle 8.9
 
-APK siap pasang juga tersedia di website pada:
+Build lewat terminal:
+
+```bash
+cd android
+echo "sdk.dir=/path/to/Android/Sdk" > local.properties
+./gradlew assembleDebug
+```
+
+APK hasil build:
 
 ```text
+android/app/build/outputs/apk/debug/app-debug.apk
+```
+
+APK siap pasang juga disalin ke:
+
+```text
+dist/notipay-listener-debug.apk
 public/assets/app/notipay-listener.apk
 ```
 
-### Cara menghubungkan aplikasi
+### Cara pakai aplikasi
 
 1. Install APK.
 2. Buka aplikasi → **Buka** pada kartu **Akses notifikasi** → aktifkan **NotiPay Listener**.
@@ -271,7 +313,11 @@ public/assets/app/notipay-listener.apk
 7. Aktifkan **Listener background** lalu **Simpan & jalankan**.
 8. Nonaktifkan optimasi baterai jika callback tidak masuk pada perangkat tertentu.
 
-Catatan: APK bawaan adalah debug build. Untuk distribusi publik, build release dengan signing key sendiri dari repository Android.
+### Catatan Android
+- `QUERY_ALL_PACKAGES` dipakai untuk menampilkan daftar aplikasi. Jika dipublikasikan ke Play Store, kebijakan ini memerlukan justifikasi khusus.
+- Beberapa OEM (Xiaomi, Oppo, Vivo, Samsung) membatasi service latar belakang. Pengguna perlu mengizinkan autostart/background activity.
+- APK di `dist/` adalah **debug build** untuk pengujian. Untuk distribusi publik, buat release build dengan signing key sendiri.
+- Notifikasi pembayaran mengandung data sensitif. Jangan gunakan pada perangkat yang tidak tepercaya.
 
 ---
 

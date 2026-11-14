@@ -1,8 +1,9 @@
-<%- include('../layouts/user-start', { pageHeading: 'Dashboard', pageSubtitle: 'Overview merchant', pageLead: 'Statistik transaksi Malaysia dan Indonesia.' }) %>
+<%- include('../layouts/user-start', { pageHeading: 'Dashboard', pageSubtitle: 'Overview merchant', pageLead: 'Statistik transaksi Malaysia, Indonesia, dan Filipina.' }) %>
 
 <% const meta = {
   MY: { label: 'Malaysia', currency: 'MYR', flag: 'MY' },
-  ID: { label: 'Indonesia', currency: 'IDR', flag: 'ID' }
+  ID: { label: 'Indonesia', currency: 'IDR', flag: 'ID' },
+  PH: { label: 'Philippines', currency: 'PHP', flag: 'PH' }
 }; %>
 
 <div class="merchant-hero">
@@ -17,7 +18,7 @@
   </div>
 </div>
 
-<% for (const region of ['MY', 'ID']) {
+<% for (const region of ['MY', 'ID', 'PH']) {
   const info = meta[region];
   const regionStats = stats[region]; %>
   <section class="region-stats">

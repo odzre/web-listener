@@ -93,7 +93,7 @@ router.post('/create-order', async (req, res, next) => {
 
     const region = normalizeRegion(req.body?.region);
     if (!region) {
-      return res.status(400).json({ success: false, message: 'Region harus MY atau ID.' });
+      return res.status(400).json({ success: false, message: 'Region harus MY, ID, atau PH.' });
     }
 
     const amount = parseAmountInput(region, req.body?.amount);

@@ -1,5 +1,5 @@
 const { store } = require('../lib/store');
-const { parseNotificationAmount, formatUnits } = require('../lib/money');
+const { parseNotificationAmount, isIncomingNotification, formatUnits } = require('../lib/money');
 const { sha256 } = require('../lib/crypto');
 const { uuid } = require('../lib/ids');
 const {
@@ -108,6 +108,13 @@ async function processNotificationCallback({
 
   if (!parsed) {
     callback.reason = 'Nominal pembayaran tidak ditemukan pada teks notifikasi.';
+    await saveCallback(callback);
+    return { callback, order: null, duplicate: false };
+  }
+
+  if (!isIncomingNotification(combined)) {
+    callback.status = 'ignored';
+    callback.reason = `Notifikasi bukan uang masuk, diabaikan (${formatUnits(parsed.region, parsed.amount)}).`;
     await saveCallback(callback);
     return { callback, order: null, duplicate: false };
   }

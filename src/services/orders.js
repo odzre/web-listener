@@ -63,6 +63,9 @@ async function createOrder({ user, region, amount, qris, expiredMinutes }) {
   if (normalizedRegion === 'ID' && amount < 1) {
     throw new Error('Minimal transaksi Rp1.');
   }
+  if (normalizedRegion === 'PH' && amount < 1) {
+    throw new Error('Minimal transaksi PHP0.01.');
+  }
 
   let code = createOrderCode();
   let guard = 0;

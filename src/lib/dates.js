@@ -28,7 +28,7 @@ function formatDate(value) {
 }
 
 function startOfPeriod(region, period, now = Date.now()) {
-  const offset = (region === 'MY' ? 8 : 7) * HOUR;
+  const offset = (region === 'ID' ? 7 : 8) * HOUR;
   const local = new Date(now + offset);
   const year = local.getUTCFullYear();
   const month = local.getUTCMonth();

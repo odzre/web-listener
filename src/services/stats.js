@@ -1,5 +1,5 @@
 const { startOfPeriod } = require('../lib/dates');
-const { formatUnits } = require('../lib/money');
+const { formatUnits, REGION_ORDER } = require('../lib/money');
 const { STATUS } = require('./orders');
 
 function summarizeRegion(orders, region, period, now = Date.now()) {
@@ -21,7 +21,7 @@ function summarizeRegion(orders, region, period, now = Date.now()) {
 
 function buildUserStats(orders, now = Date.now()) {
   const result = {};
-  for (const region of ['MY', 'ID']) {
+  for (const region of REGION_ORDER) {
     result[region] = {
       daily: summarizeRegion(orders, region, 'day', now),
       monthly: summarizeRegion(orders, region, 'month', now),
@@ -36,26 +36,36 @@ function buildAdminStats(orders, now = Date.now()) {
   const success = orders.filter((order) => order.status === STATUS.SUCCESS);
   const pending = orders.filter((order) => order.status === STATUS.PENDING);
   const expired = orders.filter((order) => order.status === STATUS.EXPIRED);
-  const revenueMy = success
-    .filter((order) => order.region === 'MY')
-    .reduce((total, order) => total + Number(order.amount || 0), 0);
-  const revenueId = success
-    .filter((order) => order.region === 'ID')
-    .reduce((total, order) => total + Number(order.amount || 0), 0);
+
+  const revenue = {};
+  const successCount = {};
+  for (const region of REGION_ORDER) {
+    revenue[region] = success
+      .filter((order) => order.region === region)
+      .reduce((total, order) => total + Number(order.amount || 0), 0);
+    successCount[region] = success.filter((order) => order.region === region).length;
+  }
 
   return {
     todayOrders: today.length,
     todaySuccess: today.filter((order) => order.status === STATUS.SUCCESS).length,
     totalOrders: orders.length,
     totalSuccess: success.length,
-    successMy: success.filter((order) => order.region === 'MY').length,
-    successId: success.filter((order) => order.region === 'ID').length,
+    successByRegion: successCount,
     totalPending: pending.length,
     totalExpired: expired.length,
-    revenueMy,
-    revenueId,
-    revenueMyFormatted: formatUnits('MY', revenueMy),
-    revenueIdFormatted: formatUnits('ID', revenueId),
+    revenue,
+    revenueFormatted: {
+      MY: formatUnits('MY', revenue.MY),
+      ID: formatUnits('ID', revenue.ID),
+      PH: formatUnits('PH', revenue.PH),
+    },
+    revenueMy: revenue.MY,
+    revenueId: revenue.ID,
+    revenuePh: revenue.PH,
+    revenueMyFormatted: formatUnits('MY', revenue.MY),
+    revenueIdFormatted: formatUnits('ID', revenue.ID),
+    revenuePhFormatted: formatUnits('PH', revenue.PH),
     successRate: orders.length ? Math.round((success.length / orders.length) * 100) : 0,
   };
 }

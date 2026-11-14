@@ -1090,6 +1090,11 @@ pre,
   background: linear-gradient(135deg, #dc2626, #991b1b);
 }
 
+.flag-ph {
+  color: #dbeafe;
+  background: linear-gradient(135deg, #1d4ed8, #b91c1c);
+}
+
 .region-example {
   display: grid;
   grid-template-columns: 1fr auto;

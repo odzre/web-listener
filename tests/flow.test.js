@@ -113,6 +113,48 @@ test('expired orders are not matched', async () => {
   assert.equal(result.callback.status, 'unmatched');
 });
 
+test('matches a Maya peso notification to a Philippines order', async () => {
+  const user = await makeUser();
+  const order = await createOrder({
+    user,
+    region: 'PH',
+    amount: 425000,
+    expiredMinutes: 5,
+  });
+
+  const result = await processNotificationCallback({
+    user,
+    packageName: 'com.maya.ph',
+    title: 'Maya',
+    text: 'Money received · You received ₱4,250.00 from +639550747407',
+    deviceId: 'android-ph',
+  });
+
+  assert.equal(result.callback.status, 'matched');
+  assert.equal(result.order.id, order.id);
+  assert.equal(result.order.formattedAmount, '₱4,250.00');
+});
+
+test('marks outgoing peso notifications as ignored', async () => {
+  const user = await makeUser();
+  await createOrder({
+    user,
+    region: 'PH',
+    amount: 425000,
+    expiredMinutes: 5,
+  });
+
+  const result = await processNotificationCallback({
+    user,
+    packageName: 'com.maya.ph',
+    title: 'Maya',
+    text: 'You sent ₱4,250.00 to +639550747407',
+  });
+
+  assert.equal(result.callback.status, 'ignored');
+  assert.equal(result.order, null);
+});
+
 test('notification without an amount is logged as unmatched', async () => {
   const user = await makeUser();
   const result = await processNotificationCallback({

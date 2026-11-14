@@ -19,7 +19,7 @@
           <p class="hero-lead">
             <%= site.siteName %> membaca notifikasi pembayaran dari aplikasi Android pilihan Anda,
             mengirim callback secara real-time, lalu mengubah order menjadi sukses. Dibuat untuk
-            merchant Malaysia dan Indonesia.
+            merchant Malaysia, Indonesia, dan Filipina.
           </p>
           <div class="hero-actions">
             <a href="<%= site.registrationOpen ? '/register' : '/login' %>" class="btn btn-primary btn-lg">Mulai sekarang <i class="ti ti-arrow-right"></i></a>
@@ -78,7 +78,7 @@
 
     <section class="trust-strip">
       <div class="container trust-grid">
-        <div><strong>2</strong><span>Region aktif</span><small>Malaysia &amp; Indonesia</small></div>
+        <div><strong>3</strong><span>Region aktif</span><small>MY &middot; ID &middot; PH</small></div>
         <div><strong>24/7</strong><span>Listener berjalan</span><small>Foreground service</small></div>
         <div><strong>&lt; 5s</strong><span>Callback</span><small>Notification ke API</small></div>
         <div><strong>100%</strong><span>Otomatis</span><small>Tanpa cek manual</small></div>
@@ -168,7 +168,7 @@
     <section class="section" id="harga">
       <div class="container">
         <div class="section-head">
-          <span class="section-kicker">Dua region</span>
+          <span class="section-kicker">Tiga region</span>
           <h2>Nominal fleksibel, format mengikuti negara.</h2>
           <p>Kirim amount dalam unit mata uang. Sistem menyimpan nilai presisi dan menampilkan format lokal.</p>
         </div>
@@ -190,6 +190,15 @@
               <span>Ditampilkan</span><strong class="money">Rp1.000</strong>
             </div>
             <p class="region-note">Parsing mendukung format <code>Rp116.000</code> dan <code>IDR 1.000.000</code>.</p>
+          </article>
+          <article class="region-card">
+            <div class="region-head"><span class="flag flag-ph">PH</span><div><h3>Philippines</h3><p>Philippine Peso</p></div><code>region: "ph"</code></div>
+            <div class="region-example">
+              <span>Request amount</span><strong>4250</strong>
+              <span>Disimpan</span><strong>425000 sentimo</strong>
+              <span>Ditampilkan</span><strong class="money">₱4,250.00</strong>
+            </div>
+            <p class="region-note">Parsing mendukung format <code>₱4,250.00</code>, <code>PHP 1,000.50</code>, dan <code>You received ₱250.00</code>.</p>
           </article>
         </div>
       </div>

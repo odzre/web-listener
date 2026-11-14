@@ -7,7 +7,7 @@ const SETTINGS_KEY = 'settings';
 const DEFAULTS = {
   siteName: 'NotiPay',
   siteTitle: 'NotiPay — Notification Payment Gateway',
-  siteDescription: 'Ubah notifikasi pembayaran menjadi status transaksi otomatis untuk Malaysia dan Indonesia.',
+  siteDescription: 'Ubah notifikasi pembayaran menjadi status transaksi otomatis untuk Malaysia, Indonesia, dan Filipina.',
   logoUrl: '',
   faviconUrl: '',
   supportEmail: 'support@notipay.local',

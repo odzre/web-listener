@@ -58,11 +58,15 @@
       <div class="card-body">
         <div class="revenue-row">
           <div><span class="flag flag-my">MY</span><div><small>Malaysia</small><strong><%= stats.revenueMyFormatted %></strong></div></div>
-          <span class="revenue-count"><%= stats.successMy %> order</span>
+          <span class="revenue-count"><%= stats.successByRegion.MY %> order</span>
         </div>
         <div class="revenue-row">
           <div><span class="flag flag-id">ID</span><div><small>Indonesia</small><strong><%= stats.revenueIdFormatted %></strong></div></div>
-          <span class="revenue-count"><%= stats.successId %> order</span>
+          <span class="revenue-count"><%= stats.successByRegion.ID %> order</span>
+        </div>
+        <div class="revenue-row">
+          <div><span class="flag flag-ph">PH</span><div><small>Philippines</small><strong><%= stats.revenuePhFormatted %></strong></div></div>
+          <span class="revenue-count"><%= stats.successByRegion.PH %> order</span>
         </div>
         <div class="quick-actions">
           <a href="/admin/apps" class="quick-action"><i class="ti ti-upload"></i><span>Upload APK</span></a>
