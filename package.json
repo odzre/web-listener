@@ -10,7 +10,8 @@
     "seed": "node scripts/seed.js",
     "test": "node --test tests/*.test.js",
     "lint": "node scripts/check-syntax.js",
-    "build:blob": "esbuild src/client/blob-client-entry.js --bundle --minify --format=iife --platform=browser --outfile=public/assets/js/blob-client.js"
+    "build:blob": "esbuild src/client/blob-client-entry.js --bundle --minify --format=iife --platform=browser --outfile=public/assets/js/blob-client.js",
+    "create:admin": "node scripts/create-admin.js"
   },
   "engines": {
     "node": ">=20"

@@ -35,6 +35,16 @@ async function getUserByApiKey(apiKey) {
 
 async function createUser({ name, email, password, role = 'user' }) {
   const normalizedEmail = String(email || '').trim().toLowerCase();
+
+  // Kunci unik per email supaya pembuatan akun paralel tidak menghasilkan duplikat.
+  const lockKey = `user:email:${normalizedEmail}`;
+  const lock = await store.set(lockKey, 'pending', { nx: true });
+  if (lock === null) {
+    const error = new Error('Email sudah terdaftar.');
+    error.code = 'EMAIL_EXISTS';
+    throw error;
+  }
+
   const existing = await getUserByEmail(normalizedEmail);
   if (existing) {
     const error = new Error('Email sudah terdaftar.');
@@ -65,7 +75,7 @@ async function createUser({ name, email, password, role = 'user' }) {
 
   await Promise.all([
     store.set(`user:${user.id}`, JSON.stringify(user)),
-    store.set(`user:email:${normalizedEmail}`, user.id),
+    store.set(lockKey, user.id),
     store.set(`apikey:${apiKey}`, user.id),
     store.sadd(USERS_SET, user.id),
   ]);

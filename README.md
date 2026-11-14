@@ -24,7 +24,6 @@ NotiPay adalah paket aplikasi pembaca notifikasi Android + website payment gatew
 - Auto-start setelah reboot bila listener diaktifkan.
 - Console log notifikasi lokal dari aplikasi yang dicentang, lengkap dengan status callback, salin, dan hapus log.
 - Dukungan Philippines (PHP) termasuk aplikasi Maya, dengan filter uang masuk otomatis.
-- Dukungan Philippines (PHP) termasuk aplikasi Maya, dengan filter uang masuk otomatis.
 - Halaman tes koneksi, status callback terakhir, dan permintaan pengecualian optimasi baterai.
 - APK debug siap pasang tersedia di `dist/notipay-listener-debug.apk`.
 
@@ -96,6 +95,23 @@ Password : Admin#12345
 ```
 
 Akun admin dibuat otomatis dari `ADMIN_EMAIL` / `ADMIN_PASSWORD`. **Ganti password sebelum production.**
+
+### Lupa password admin?
+
+Jalankan salah satu perintah berikut. Memakai email yang sudah ada akan mereset passwordnya dan memaksa role admin.
+
+```bash
+# interaktif
+npm run create:admin
+
+# langsung dengan argumen
+npm run create:admin -- --email admin@domain.com --password 'PasswordBaru123!'
+
+# generate password otomatis (bisa diubah dari dashboard)
+npm run create:admin -- --email admin@domain.com --yes
+```
+
+Pelanggan yang lupa password tidak perlu akses CLI: admin dapat mereset dari **Admin → Pengguna**, sedangkan pengguna bisa mengganti password sendiri di **Pengaturan → Keamanan**.
 
 Tanpa `UPSTASH_REDIS_REST_URL` dan `UPSTASH_REDIS_REST_TOKEN`, aplikasi memakai penyimpanan memori sementara. Data akan hilang saat server restart.
 
@@ -192,16 +208,6 @@ Callback yang tidak punya nominal atau tidak menemukan order akan muncul di **Ad
 | `my` | `1` | `100` sen | `RM1.00` |
 | `id` | `1000` | `1000` rupiah | `Rp1.000` |
 | `id` | `1000000` | `1000000` rupiah | `Rp1.000.000` |
-| `ph` | `4250` | `425000` sentimo | `₱4,250.00` |
-| `ph` | `250.50` | `25050` sentimo | `₱250.50` |
-
-Parsing notifikasi mendukung format berikut:
-
-- Malaysia: `RM116.00`, `RM1,000.50`
-- Indonesia: `Rp116.000`, `IDR 1.000.000`
-- Philippines: `₱4,250.00`, `PHP 1,000.50`, `You received ₱4,250.00 from +639550747407`
-
-Notifikasi yang bukan uang masuk (misalnya `You sent ₱4,250.00 to ...`) otomatis diabaikan dan tidak mengubah order.
 | `ph` | `4250` | `425000` sentimo | `₱4,250.00` |
 | `ph` | `250.50` | `25050` sentimo | `₱250.50` |
 
