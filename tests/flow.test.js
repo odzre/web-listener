@@ -135,6 +135,28 @@ test('matches a Maya peso notification to a Philippines order', async () => {
   assert.equal(result.order.formattedAmount, '₱4,250.00');
 });
 
+test('matches an InstaPay peso notification without a currency symbol', async () => {
+  const user = await makeUser();
+  const order = await createOrder({
+    user,
+    region: 'PH',
+    amount: 100000,
+    expiredMinutes: 5,
+  });
+
+  const result = await processNotificationCallback({
+    user,
+    packageName: 'com.maya.ph',
+    title: 'Maya',
+    text: 'You received 1,000.00 in your wallet via InstaPay',
+  });
+
+  assert.equal(result.callback.status, 'matched');
+  assert.equal(result.order.id, order.id);
+  assert.equal(result.callback.parsed.region, 'PH');
+  assert.equal(result.callback.parsed.amount, 100000);
+});
+
 test('marks outgoing peso notifications as ignored', async () => {
   const user = await makeUser();
   await createOrder({

@@ -30,6 +30,14 @@ test('parses Philippine peso notification amounts', () => {
   assert.equal(parseNotificationAmount('PHP 1,000.00').region, 'PH');
 });
 
+test('parses InstaPay notification without a currency symbol', () => {
+  const text = 'You received 1,000.00 in your wallet via InstaPay';
+  const parsed = parseNotificationAmount(text);
+  assert.equal(parsed.region, 'PH');
+  assert.equal(parsed.amount, 100000);
+  assert.equal(isIncomingNotification(text), true);
+});
+
 test('parses a full Maya incoming notification', () => {
   const text = 'Money received ↙️ You received ₱4,250.00 from +639550747407';
   const parsed = parseNotificationAmount(text);

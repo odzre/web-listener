@@ -1,5 +1,5 @@
 const { store } = require('../lib/store');
-const { parseNotificationAmount, isIncomingNotification, formatUnits } = require('../lib/money');
+const { parseNotificationAmounts, isIncomingNotification, formatUnits } = require('../lib/money');
 const { sha256 } = require('../lib/crypto');
 const { uuid } = require('../lib/ids');
 const {
@@ -103,10 +103,10 @@ async function processNotificationCallback({
     createdAt: new Date(now).toISOString(),
   };
 
-  const parsed = parseNotificationAmount(combined);
-  callback.parsed = parsed;
+  const candidates = parseNotificationAmounts(combined);
+  callback.parsed = candidates[0] || null;
 
-  if (!parsed) {
+  if (!candidates.length) {
     callback.reason = 'Nominal pembayaran tidak ditemukan pada teks notifikasi.';
     await saveCallback(callback);
     return { callback, order: null, duplicate: false };
@@ -114,22 +114,35 @@ async function processNotificationCallback({
 
   if (!isIncomingNotification(combined)) {
     callback.status = 'ignored';
-    callback.reason = `Notifikasi bukan uang masuk, diabaikan (${formatUnits(parsed.region, parsed.amount)}).`;
+    callback.reason = `Notifikasi bukan uang masuk, diabaikan (${formatUnits(callback.parsed.region, callback.parsed.amount)}).`;
     await saveCallback(callback);
     return { callback, order: null, duplicate: false };
   }
 
-  const order = await findOrderForCallback({
-    userId: user?.id || null,
-    region: parsed.region,
-    amount: parsed.amount,
-  });
+  let order = null;
+  let matchedCandidate = null;
+  for (const candidate of candidates) {
+    order = await findOrderForCallback({
+      userId: user?.id || null,
+      region: candidate.region,
+      amount: candidate.amount,
+    });
+    if (order) {
+      matchedCandidate = candidate;
+      break;
+    }
+  }
 
   if (!order) {
-    callback.reason = `Tidak ada order pending ${formatUnits(parsed.region, parsed.amount)}.`;
+    callback.reason = `Tidak ada order pending untuk nominal ${candidates
+      .map((candidate) => formatUnits(candidate.region, candidate.amount))
+      .join(' / ')}.`;
     await saveCallback(callback);
     return { callback, order: null, duplicate: false };
   }
+
+  callback.parsed = matchedCandidate;
+  const parsed = matchedCandidate;
 
   const lockKey = `lock:order:${order.id}`;
   const lock = await store.set(lockKey, callback.id, { ex: 20, nx: true });

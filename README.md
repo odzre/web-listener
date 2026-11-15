@@ -1,12 +1,12 @@
 # NotiPay — Notification Payment Gateway
 
-NotiPay adalah paket aplikasi pembaca notifikasi Android + website payment gateway berbasis Express.js. Aplikasi Android membaca notifikasi dari aplikasi pembayaran yang dipilih, mengirim callback ke website, lalu website mencocokkan nominal dengan order pending dan mengubah statusnya menjadi **success**.
+Website NotiPay adalah payment gateway berbasis notifikasi yang dibangun dengan Express.js. Website menerima callback dari aplikasi Android listener, mencocokkan nominal dengan order pending, lalu mengubah statusnya menjadi **success**.
 
 - **Website**: Express.js + EJS + Tabler
 - **Hosting**: Vercel
 - **Database**: Upstash Redis (REST)
 - **File storage**: Vercel Blob (opsional, disarankan)
-- **Android**: Kotlin, NotificationListenerService, WorkManager, foreground service
+- **Aplikasi Android**: tersedia di repository terpisah [odzre/apk-listener](https://github.com/odzre/apk-listener)
 - **Region**: Malaysia (`MY` / MYR), Indonesia (`ID` / IDR), Philippines (`PH` / PHP)
 
 > Proyek ini adalah alat konfirmasi pembayaran berbasis notifikasi, bukan penyedia payment gateway berlisensi. Pastikan penggunaan sesuai hukum, kebijakan aplikasi pembayaran, dan kebutuhan bisnis Anda. Selalu verifikasi transaksi bernilai besar.
@@ -25,7 +25,7 @@ NotiPay adalah paket aplikasi pembaca notifikasi Android + website payment gatew
 - Console log notifikasi lokal dari aplikasi yang dicentang, lengkap dengan status callback, salin, dan hapus log.
 - Dukungan Philippines (PHP) termasuk aplikasi Maya, dengan filter uang masuk otomatis.
 - Halaman tes koneksi, status callback terakhir, dan permintaan pengecualian optimasi baterai.
-- APK debug siap pasang tersedia di `dist/notipay-listener-debug.apk`.
+- APK siap pasang tersedia di `public/assets/app/notipay-listener.apk` dan dapat diganti dari admin.
 
 ### Website pengguna
 - Landing page dark, responsif, navbar interaktif, dan footer lengkap.
@@ -67,8 +67,6 @@ NotiPay adalah paket aplikasi pembaca notifikasi Android + website payment gatew
 ├── public/assets/               # CSS, JS, APK bawaan
 ├── tests/                       # test node:test
 ├── scripts/seed.js
-├── android/                     # project Android Studio
-├── dist/notipay-listener-debug.apk
 └── vercel.json
 ```
 
@@ -215,7 +213,7 @@ Parsing notifikasi mendukung format berikut:
 
 - Malaysia: `RM116.00`, `RM1,000.50`
 - Indonesia: `Rp116.000`, `IDR 1.000.000`
-- Philippines: `₱4,250.00`, `PHP 1,000.50`, `You received ₱4,250.00 from +639550747407`
+- Philippines: `₱4,250.00`, `PHP 1,000.50`, `You received ₱4,250.00 from +639550747407`, `You received 1,000.00 in your wallet via InstaPay`
 
 Notifikasi yang bukan uang masuk (misalnya `You sent ₱4,250.00 to ...`) otomatis diabaikan dan tidak mengubah order.
 
@@ -278,52 +276,30 @@ Status: `pending`, `success`, `expired`.
 
 ---
 
-## Android App
+## Aplikasi Android
 
-Project: `android/`
+Source code aplikasi listener ada di repository terpisah:
 
-Prasyarat build:
-- JDK 17
-- Android SDK 35
-- Android Studio (disarankan) atau Gradle 8.9
+**https://github.com/odzre/apk-listener**
 
-Build lewat terminal:
-
-```bash
-cd android
-echo "sdk.dir=/path/to/Android/Sdk" > local.properties
-./gradlew assembleDebug
-```
-
-APK hasil build:
+APK siap pasang juga tersedia di website pada:
 
 ```text
-android/app/build/outputs/apk/debug/app-debug.apk
-```
-
-APK siap pasang juga disalin ke:
-
-```text
-dist/notipay-listener-debug.apk
 public/assets/app/notipay-listener.apk
 ```
 
-### Cara pakai aplikasi
+### Cara menghubungkan aplikasi
 
 1. Install APK.
 2. Buka aplikasi → **Buka** pada kartu **Akses notifikasi** → aktifkan **NotiPay Listener**.
 3. Di website, login → **Pengaturan**, salin **API key** dan **URL callback**.
 4. Tempel di aplikasi, isi nama perangkat (opsional).
-5. Centang aplikasi pembayaran yang ingin dipantau.
+5. Centang aplikasi pembayaran yang ingin dipantau (Maya otomatis dicentang bila terpasang).
 6. Tekan **Tes koneksi callback** untuk memastikan API key valid.
 7. Aktifkan **Listener background** lalu **Simpan & jalankan**.
 8. Nonaktifkan optimasi baterai jika callback tidak masuk pada perangkat tertentu.
 
-### Catatan Android
-- `QUERY_ALL_PACKAGES` dipakai untuk menampilkan daftar aplikasi. Jika dipublikasikan ke Play Store, kebijakan ini memerlukan justifikasi khusus.
-- Beberapa OEM (Xiaomi, Oppo, Vivo, Samsung) membatasi service latar belakang. Pengguna perlu mengizinkan autostart/background activity.
-- APK di `dist/` adalah **debug build** untuk pengujian. Untuk distribusi publik, buat release build dengan signing key sendiri.
-- Notifikasi pembayaran mengandung data sensitif. Jangan gunakan pada perangkat yang tidak tepercaya.
+Catatan: APK bawaan adalah debug build. Untuk distribusi publik, build release dengan signing key sendiri dari repository Android.
 
 ---
 

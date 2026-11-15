@@ -94,34 +94,67 @@ function formatNumber(region, units) {
   return String(Math.round(amount));
 }
 
-function parseNotificationAmount(text) {
+function parseNotificationAmounts(text) {
   const source = String(text || '');
+  const candidates = [];
+  const seen = new Set();
+
+  const push = (region, amount, raw) => {
+    if (!Number.isFinite(amount) || amount <= 0) return;
+    const key = `${region}:${amount}`;
+    if (seen.has(key)) return;
+    seen.add(key);
+    candidates.push({ region, amount, raw });
+  };
+
   const myMatch = source.match(/\bRM\s*([0-9][0-9.,]*)/i);
   if (myMatch) {
     const value = parseLocaleNumber(myMatch[1], 'MY');
-    if (Number.isFinite(value)) {
-      return { region: 'MY', amount: amountToUnits('MY', value), raw: myMatch[0] };
-    }
+    if (Number.isFinite(value)) push('MY', amountToUnits('MY', value), myMatch[0]);
   }
 
-  const phMatch = source.match(/(?:\bPHP\b|\bPhp\b|\bPhP\b|₱)\s*([0-9][0-9.,]*)/);
+  const phMatch = source.match(/(?:\bPHP\b|₱)\s*([0-9][0-9.,]*)/i);
   if (phMatch) {
     const value = parseLocaleNumber(phMatch[1], 'PH');
-    if (Number.isFinite(value)) {
-      return { region: 'PH', amount: amountToUnits('PH', value), raw: phMatch[0] };
-    }
+    if (Number.isFinite(value)) push('PH', amountToUnits('PH', value), phMatch[0]);
   }
 
   const idMatch = source.match(/(?:\bRp\.?|\bIDR)\s*([0-9][0-9.,]*)/i);
   if (idMatch) {
     const value = parseLocaleNumber(idMatch[1], 'ID');
-    if (Number.isFinite(value)) {
-      return { region: 'ID', amount: amountToUnits('ID', value), raw: idMatch[0] };
+    if (Number.isFinite(value)) push('ID', amountToUnits('ID', value), idMatch[0]);
+  }
+
+  // Fallback untuk notifikasi tanpa simbol mata uang, misalnya:
+  // "You received 1,000.00 in your wallet via InstaPay"
+  const phContext = /(instapay|peso|maya|gcash|philippines)/i.test(source) || source.includes('₱');
+  const incomingContext = isIncomingNotification(source) || candidates.length > 0;
+  if (!incomingContext && !phContext) return candidates;
+
+  const barePattern = /(?:^|[^0-9.,])([0-9]{1,3}(?:,[0-9]{3})+(?:\.[0-9]{1,2})?|[0-9]+\.[0-9]{1,2}|[0-9]{1,7})(?![0-9.,])/g;
+  for (const match of source.matchAll(barePattern)) {
+    const token = match[1];
+    const hasSeparator = token.includes(',') || token.includes('.');
+    const value = Number(token.replace(/,/g, ''));
+    if (!Number.isFinite(value) || value <= 0) continue;
+    if (!hasSeparator && token.length > 7) continue;
+
+    if (phContext) {
+      push('PH', amountToUnits('PH', value), token);
+    } else {
+      push('PH', amountToUnits('PH', value), token);
+      push('MY', amountToUnits('MY', value), token);
+      if (Number.isInteger(value)) push('ID', amountToUnits('ID', value), token);
     }
   }
 
-  return null;
+  return candidates;
 }
+
+function parseNotificationAmount(text) {
+  return parseNotificationAmounts(text)[0] || null;
+}
+
 
 function isIncomingNotification(text) {
   const source = String(text || '').toLowerCase();
@@ -164,6 +197,7 @@ module.exports = {
   parseAmountInput,
   amountToUnits,
   parseNotificationAmount,
+  parseNotificationAmounts,
   isIncomingNotification,
   formatUnits,
   formatNumber,
